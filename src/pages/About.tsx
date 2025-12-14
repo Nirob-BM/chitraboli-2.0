@@ -3,27 +3,19 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ArrowRight, Heart, Sparkles, Award, Users } from "lucide-react";
 import heroImage from "@/assets/hero-jewelry.jpg";
-
 const About = () => {
-  return (
-    <Layout>
+  return <Layout>
       {/* Hero */}
       <section className="relative py-24 bg-card overflow-hidden">
         <div className="absolute inset-0 opacity-20">
-          <img
-            src={heroImage}
-            alt="Jewelry crafting"
-            className="w-full h-full object-cover"
-          />
+          <img src={heroImage} alt="Jewelry crafting" className="w-full h-full object-cover" />
         </div>
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="font-display text-4xl md:text-6xl font-light text-foreground mb-4">
               About <span className="text-gold">Chitraboli</span>
             </h1>
-            <p className="font-display text-2xl text-gold-light mb-6">
-              চিত্রাবলী
-            </p>
+            <p className="font-display text-2xl text-gold-light mb-6">চিত্রাবলী ✨</p>
             <p className="text-muted-foreground text-lg leading-relaxed">
               Where tradition meets artistry, and every piece tells a story.
             </p>
@@ -67,32 +59,23 @@ const About = () => {
             Our <span className="text-gold">Values</span>
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              {
-                icon: Heart,
-                title: "Passion",
-                description: "Every piece is crafted with genuine love and dedication",
-              },
-              {
-                icon: Sparkles,
-                title: "Artistry",
-                description: "We blend traditional techniques with modern aesthetics",
-              },
-              {
-                icon: Award,
-                title: "Quality",
-                description: "Only the finest materials make it into our creations",
-              },
-              {
-                icon: Users,
-                title: "Community",
-                description: "Supporting local artisans and preserving craft traditions",
-              },
-            ].map((value) => (
-              <div
-                key={value.title}
-                className="text-center p-6 rounded-lg bg-background border border-border/50 hover:border-primary/30 transition-all duration-500 hover:shadow-gold"
-              >
+            {[{
+            icon: Heart,
+            title: "Passion",
+            description: "Every piece is crafted with genuine love and dedication"
+          }, {
+            icon: Sparkles,
+            title: "Artistry",
+            description: "We blend traditional techniques with modern aesthetics"
+          }, {
+            icon: Award,
+            title: "Quality",
+            description: "Only the finest materials make it into our creations"
+          }, {
+            icon: Users,
+            title: "Community",
+            description: "Supporting local artisans and preserving craft traditions"
+          }].map(value => <div key={value.title} className="text-center p-6 rounded-lg bg-background border border-border/50 hover:border-primary/30 transition-all duration-500 hover:shadow-gold">
                 <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary/10 text-primary mb-4">
                   <value.icon className="h-7 w-7" />
                 </div>
@@ -102,8 +85,7 @@ const About = () => {
                 <p className="text-muted-foreground text-sm">
                   {value.description}
                 </p>
-              </div>
-            ))}
+              </div>)}
           </div>
         </div>
       </section>
@@ -125,8 +107,6 @@ const About = () => {
           </Button>
         </div>
       </section>
-    </Layout>
-  );
+    </Layout>;
 };
-
 export default About;
