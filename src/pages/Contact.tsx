@@ -5,26 +5,27 @@ import { Textarea } from "@/components/ui/textarea";
 import { Facebook, Instagram, Mail, Phone, MapPin, Send } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useState } from "react";
-
 const Contact = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     subject: "",
-    message: "",
+    message: ""
   });
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     toast({
       title: "Message Sent!",
-      description: "Thank you for contacting us. We'll get back to you soon.",
+      description: "Thank you for contacting us. We'll get back to you soon."
     });
-    setFormData({ name: "", email: "", subject: "", message: "" });
+    setFormData({
+      name: "",
+      email: "",
+      subject: "",
+      message: ""
+    });
   };
-
-  return (
-    <Layout>
+  return <Layout>
       {/* Header */}
       <section className="py-16 bg-card">
         <div className="container mx-auto px-4 text-center">
@@ -58,7 +59,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <h3 className="font-display text-lg font-medium text-foreground">Phone</h3>
-                    <p className="text-muted-foreground">+880 1234 567890</p>
+                    <p className="text-muted-foreground">+880 13086 97630</p>
                   </div>
                 </div>
 
@@ -68,7 +69,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <h3 className="font-display text-lg font-medium text-foreground">Email</h3>
-                    <p className="text-muted-foreground">hello@chitraboli.com</p>
+                    <p className="text-muted-foreground">chitraboli@gmail.com</p>
                   </div>
                 </div>
 
@@ -89,18 +90,10 @@ const Contact = () => {
                   Follow Us
                 </h3>
                 <div className="flex gap-4">
-                  <a
-                    href="https://www.facebook.com/chitraboli1"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="h-12 w-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                  >
+                  <a href="https://www.facebook.com/chitraboli1" target="_blank" rel="noopener noreferrer" className="h-12 w-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors">
                     <Facebook className="h-5 w-5" />
                   </a>
-                  <a
-                    href="#"
-                    className="h-12 w-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                  >
+                  <a href="#" className="h-12 w-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors">
                     <Instagram className="h-5 w-5" />
                   </a>
                 </div>
@@ -118,52 +111,38 @@ const Contact = () => {
                     <label className="block text-sm font-medium text-foreground mb-2">
                       Your Name
                     </label>
-                    <Input
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      placeholder="Enter your name"
-                      required
-                      className="bg-background border-border/50 focus:border-primary"
-                    />
+                    <Input value={formData.name} onChange={e => setFormData({
+                    ...formData,
+                    name: e.target.value
+                  })} placeholder="Enter your name" required className="bg-background border-border/50 focus:border-primary" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">
                       Email Address
                     </label>
-                    <Input
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      placeholder="Enter your email"
-                      required
-                      className="bg-background border-border/50 focus:border-primary"
-                    />
+                    <Input type="email" value={formData.email} onChange={e => setFormData({
+                    ...formData,
+                    email: e.target.value
+                  })} placeholder="Enter your email" required className="bg-background border-border/50 focus:border-primary" />
                   </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
                     Subject
                   </label>
-                  <Input
-                    value={formData.subject}
-                    onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                    placeholder="What is this about?"
-                    required
-                    className="bg-background border-border/50 focus:border-primary"
-                  />
+                  <Input value={formData.subject} onChange={e => setFormData({
+                  ...formData,
+                  subject: e.target.value
+                })} placeholder="What is this about?" required className="bg-background border-border/50 focus:border-primary" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
                     Message
                   </label>
-                  <Textarea
-                    value={formData.message}
-                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    placeholder="Tell us more..."
-                    rows={5}
-                    required
-                    className="bg-background border-border/50 focus:border-primary resize-none"
-                  />
+                  <Textarea value={formData.message} onChange={e => setFormData({
+                  ...formData,
+                  message: e.target.value
+                })} placeholder="Tell us more..." rows={5} required className="bg-background border-border/50 focus:border-primary resize-none" />
                 </div>
                 <Button variant="gold" size="lg" className="w-full">
                   <Send className="mr-2 h-4 w-4" />
@@ -174,8 +153,6 @@ const Contact = () => {
           </div>
         </div>
       </section>
-    </Layout>
-  );
+    </Layout>;
 };
-
 export default Contact;
