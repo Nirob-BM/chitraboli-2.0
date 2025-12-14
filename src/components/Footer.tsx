@@ -10,9 +10,7 @@ export function Footer() {
               <span className="font-display text-3xl font-semibold text-gold tracking-wide">
                 Chitraboli
               </span>
-              <span className="font-display text-lg text-gold-light opacity-80">
-                চিত্রাবলী
-              </span>
+              <span className="font-display text-lg text-gold-light opacity-80">চিত্রাবলী ✨</span>
             </Link>
             <p className="text-muted-foreground font-body text-sm leading-relaxed max-w-md">
               Handmade with Love, Crafted with Passion. Every piece of Chitraboli jewellery is inspired by art, 
