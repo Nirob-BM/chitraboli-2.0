@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
-import { Search, Package, Truck, CheckCircle, XCircle, Clock, AlertCircle } from "lucide-react";
+import { Search, Package, Truck, CheckCircle, XCircle, Clock, AlertCircle, ShieldCheck } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 interface OrderItem {
@@ -44,8 +44,8 @@ const ORDER_STATUSES = [
 ];
 
 const TrackOrder = () => {
-  const [searchType, setSearchType] = useState<'id' | 'phone'>('id');
-  const [searchValue, setSearchValue] = useState("");
+  const [orderId, setOrderId] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
@@ -53,10 +53,19 @@ const TrackOrder = () => {
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!searchValue.trim()) {
+    if (!orderId.trim() || !phoneNumber.trim()) {
       toast({
-        title: "Please enter a value",
-        description: searchType === 'id' ? "Enter your order ID" : "Enter your phone number",
+        title: "Both fields required",
+        description: "Please enter both your order ID and phone number for verification",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (phoneNumber.trim().length < 10) {
+      toast({
+        title: "Invalid phone number",
+        description: "Please enter a valid phone number (at least 10 digits)",
         variant: "destructive"
       });
       return;
@@ -66,10 +75,9 @@ const TrackOrder = () => {
     setSearched(true);
 
     try {
-      // Use secure RPC function for order tracking
       const { data, error } = await supabase.rpc('track_order', {
-        search_type: searchType,
-        search_value: searchValue.trim()
+        order_id: orderId.trim(),
+        phone_number: phoneNumber.trim()
       });
 
       if (error) throw error;
@@ -91,8 +99,8 @@ const TrackOrder = () => {
       console.error('Error fetching order:', error);
       setOrder(null);
       toast({
-        title: "Error",
-        description: "Failed to fetch order. Please check your input and try again.",
+        title: "Order not found",
+        description: "No order found with the provided details. Please verify your order ID and phone number.",
         variant: "destructive"
       });
     } finally {
@@ -109,7 +117,7 @@ const TrackOrder = () => {
     const currentIndex = statusOrder.indexOf(currentStatus);
     
     if (currentStatus === 'cancelled') {
-      return statusOrder.map((status, index) => ({
+      return statusOrder.map((status) => ({
         ...ORDER_STATUSES.find(s => s.value === status)!,
         completed: false,
         current: false,
@@ -144,52 +152,45 @@ const TrackOrder = () => {
               Track Your Order
             </h1>
             <p className="text-muted-foreground">
-              Enter your order ID or phone number to check your order status
+              Enter your order ID and phone number to check your order status
             </p>
           </div>
 
           {/* Search Form */}
           <Card className="mb-8">
             <CardContent className="pt-6">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4 p-3 bg-muted/50 rounded-lg">
+                <ShieldCheck className="w-4 h-4 text-primary" />
+                <span>For your security, both order ID and phone number are required</span>
+              </div>
+              
               <form onSubmit={handleSearch} className="space-y-4">
-                <div className="flex gap-2 mb-4">
-                  <Button
-                    type="button"
-                    variant={searchType === 'id' ? 'default' : 'outline'}
-                    onClick={() => setSearchType('id')}
-                    className="flex-1"
-                  >
-                    Order ID
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={searchType === 'phone' ? 'default' : 'outline'}
-                    onClick={() => setSearchType('phone')}
-                    className="flex-1"
-                  >
-                    Phone Number
-                  </Button>
+                <div className="space-y-2">
+                  <Label htmlFor="orderId">Order ID</Label>
+                  <Input
+                    id="orderId"
+                    type="text"
+                    placeholder="Enter your order ID..."
+                    value={orderId}
+                    onChange={(e) => setOrderId(e.target.value)}
+                  />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="search">
-                    {searchType === 'id' ? 'Order ID' : 'Phone Number'}
-                  </Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="search"
-                      type={searchType === 'phone' ? 'tel' : 'text'}
-                      placeholder={searchType === 'id' ? 'Enter your order ID...' : 'Enter your phone number...'}
-                      value={searchValue}
-                      onChange={(e) => setSearchValue(e.target.value)}
-                      className="flex-1"
-                    />
-                    <Button type="submit" disabled={loading}>
-                      <Search className="w-4 h-4 mr-2" />
-                      {loading ? 'Searching...' : 'Track'}
-                    </Button>
-                  </div>
+                  <Label htmlFor="phone">Phone Number</Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    placeholder="Enter the phone number used for this order..."
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                  />
                 </div>
+
+                <Button type="submit" disabled={loading} className="w-full">
+                  <Search className="w-4 h-4 mr-2" />
+                  {loading ? 'Searching...' : 'Track Order'}
+                </Button>
               </form>
             </CardContent>
           </Card>
@@ -218,7 +219,7 @@ const TrackOrder = () => {
                       ) : (
                         <div className="relative">
                           <div className="flex justify-between">
-                            {getStatusSteps(order.status).map((step, index) => {
+                            {getStatusSteps(order.status).map((step) => {
                               const Icon = step.icon;
                               return (
                                 <div key={step.value} className="flex flex-col items-center flex-1">
@@ -326,9 +327,9 @@ const TrackOrder = () => {
                     <AlertCircle className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
                     <h3 className="text-lg font-medium mb-2">No Order Found</h3>
                     <p className="text-muted-foreground">
-                      We couldn't find an order with the provided {searchType === 'id' ? 'order ID' : 'phone number'}.
+                      We couldn't find an order matching both the order ID and phone number.
                       <br />
-                      Please check your input and try again.
+                      Please verify your details and try again.
                     </p>
                   </CardContent>
                 </Card>

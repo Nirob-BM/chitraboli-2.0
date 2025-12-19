@@ -159,7 +159,7 @@ export type Database = {
         Returns: boolean
       }
       track_order: {
-        Args: { search_type: string; search_value: string }
+        Args: { order_id: string; phone_number: string }
         Returns: {
           created_at: string
           customer_name: string
