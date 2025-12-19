@@ -2,9 +2,12 @@ import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ArrowRight, Heart, Sparkles, Award, Users } from "lucide-react";
+import { ReviewsSection } from "@/components/ReviewsSection";
 import heroImage from "@/assets/hero-jewelry.jpg";
+
 const About = () => {
-  return <Layout>
+  return (
+    <Layout>
       {/* Hero */}
       <section className="relative py-24 bg-card overflow-hidden">
         <div className="absolute inset-0 opacity-20">
@@ -59,36 +62,47 @@ const About = () => {
             Our <span className="text-gold">Values</span>
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[{
-            icon: Heart,
-            title: "Passion",
-            description: "Every piece is crafted with genuine love and dedication"
-          }, {
-            icon: Sparkles,
-            title: "Artistry",
-            description: "We blend traditional techniques with modern aesthetics"
-          }, {
-            icon: Award,
-            title: "Quality",
-            description: "Only the finest materials make it into our creations"
-          }, {
-            icon: Users,
-            title: "Community",
-            description: "Supporting local artisans and preserving craft traditions"
-          }].map(value => <div key={value.title} className="text-center p-6 rounded-lg bg-background border border-border/50 hover:border-primary/30 transition-all duration-500 hover:shadow-gold">
+            {[
+              {
+                icon: Heart,
+                title: "Passion",
+                description: "Every piece is crafted with genuine love and dedication"
+              },
+              {
+                icon: Sparkles,
+                title: "Artistry",
+                description: "We blend traditional techniques with modern aesthetics"
+              },
+              {
+                icon: Award,
+                title: "Quality",
+                description: "Only the finest materials make it into our creations"
+              },
+              {
+                icon: Users,
+                title: "Community",
+                description: "Supporting local artisans and preserving craft traditions"
+              }
+            ].map((value) => (
+              <div
+                key={value.title}
+                className="text-center p-6 rounded-lg bg-background border border-border/50 hover:border-primary/30 transition-all duration-500 hover:shadow-gold"
+              >
                 <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary/10 text-primary mb-4">
                   <value.icon className="h-7 w-7" />
                 </div>
                 <h3 className="font-display text-xl font-semibold text-foreground mb-2">
                   {value.title}
                 </h3>
-                <p className="text-muted-foreground text-sm">
-                  {value.description}
-                </p>
-              </div>)}
+                <p className="text-muted-foreground text-sm">{value.description}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
+
+      {/* Reviews Section */}
+      <ReviewsSection />
 
       {/* CTA */}
       <section className="py-20 bg-background">
@@ -107,6 +121,8 @@ const About = () => {
           </Button>
         </div>
       </section>
-    </Layout>;
+    </Layout>
+  );
 };
+
 export default About;
