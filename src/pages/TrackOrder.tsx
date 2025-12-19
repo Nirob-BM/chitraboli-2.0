@@ -22,9 +22,6 @@ interface OrderItem {
 interface Order {
   id: string;
   customer_name: string;
-  customer_email: string;
-  customer_phone: string;
-  customer_address: string;
   items: OrderItem[];
   total_amount: number;
   status: string;
@@ -69,22 +66,23 @@ const TrackOrder = () => {
     setSearched(true);
 
     try {
-      let query = supabase.from('orders').select('*');
-      
-      if (searchType === 'id') {
-        query = query.eq('id', searchValue.trim());
-      } else {
-        query = query.eq('customer_phone', searchValue.trim());
-      }
-
-      const { data, error } = await query.order('created_at', { ascending: false }).limit(1).maybeSingle();
+      // Use secure RPC function for order tracking
+      const { data, error } = await supabase.rpc('track_order', {
+        search_type: searchType,
+        search_value: searchValue.trim()
+      });
 
       if (error) throw error;
 
-      if (data) {
+      if (data && data.length > 0) {
+        const orderData = data[0];
         setOrder({
-          ...data,
-          items: Array.isArray(data.items) ? (data.items as unknown as OrderItem[]) : []
+          id: orderData.id,
+          customer_name: orderData.customer_name,
+          status: orderData.status,
+          created_at: orderData.created_at,
+          total_amount: orderData.total_amount,
+          items: Array.isArray(orderData.items) ? (orderData.items as unknown as OrderItem[]) : []
         });
       } else {
         setOrder(null);
@@ -274,18 +272,10 @@ const TrackOrder = () => {
                           <span className="text-muted-foreground">Order Date</span>
                           <p>{formatDate(order.created_at)}</p>
                         </div>
-                        <div>
+                        <div className="col-span-2">
                           <span className="text-muted-foreground">Customer Name</span>
                           <p>{order.customer_name}</p>
                         </div>
-                        <div>
-                          <span className="text-muted-foreground">Phone</span>
-                          <p>{order.customer_phone}</p>
-                        </div>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground text-sm">Delivery Address</span>
-                        <p className="text-sm">{order.customer_address}</p>
                       </div>
                     </CardContent>
                   </Card>
