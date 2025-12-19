@@ -35,11 +35,47 @@ export function Footer() {
               Quick Links
             </h4>
             <ul className="space-y-3">
-              {["Shop", "Collections", "About Us", "Contact"].map(item => <li key={item}>
-                  <Link to={`/${item.toLowerCase().replace(" ", "-")}`} className="text-muted-foreground text-sm hover:text-primary transition-colors">
-                    {item}
+              {[
+                { label: "Shop", path: "/shop" },
+                { label: "Collections", path: "/collections" },
+                { label: "About Us", path: "/about" },
+                { label: "Contact", path: "/contact" },
+                { label: "Track Order", path: "/track-order" },
+              ].map((item) => (
+                <li key={item.label}>
+                  <Link
+                    to={item.path}
+                    className="text-muted-foreground text-sm hover:text-primary transition-colors"
+                  >
+                    {item.label}
                   </Link>
-                </li>)}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Admin Section */}
+          <div>
+            <h4 className="font-display text-lg font-semibold text-foreground mb-4">
+              Admin
+            </h4>
+            <ul className="space-y-3">
+              <li>
+                <Link
+                  to="/admin"
+                  className="text-muted-foreground text-sm hover:text-primary transition-colors"
+                >
+                  Order Management
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/auth"
+                  className="text-muted-foreground text-sm hover:text-primary transition-colors"
+                >
+                  Admin Login
+                </Link>
+              </li>
             </ul>
           </div>
 
