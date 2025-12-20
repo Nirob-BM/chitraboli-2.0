@@ -1,7 +1,25 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Facebook, Instagram, Mail, Phone, MapPin, MessageCircle } from "lucide-react";
+
 export function Footer() {
-  return <footer className="bg-card border-t border-border">
+  const location = useLocation();
+  const isAdminPage = location.pathname === "/admin";
+
+  // Minimal footer for admin page
+  if (isAdminPage) {
+    return (
+      <footer className="bg-card border-t border-border py-6">
+        <div className="container mx-auto px-4 text-center">
+          <p className="text-muted-foreground text-sm">
+            © {new Date().getFullYear()} Chitraboli চিত্রাবলী. Admin Panel.
+          </p>
+        </div>
+      </footer>
+    );
+  }
+
+  return (
+    <footer className="bg-card border-t border-border">
       <div className="container mx-auto px-4 py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           {/* Brand */}
@@ -54,31 +72,6 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Admin Section */}
-          <div>
-            <h4 className="font-display text-lg font-semibold text-foreground mb-4">
-              Admin
-            </h4>
-            <ul className="space-y-3">
-              <li>
-                <Link
-                  to="/admin"
-                  className="text-muted-foreground text-sm hover:text-primary transition-colors"
-                >
-                  Order Management
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/auth"
-                  className="text-muted-foreground text-sm hover:text-primary transition-colors"
-                >
-                  Admin Login
-                </Link>
-              </li>
-            </ul>
-          </div>
-
           {/* Contact */}
           <div>
             <h4 className="font-display text-lg font-semibold text-foreground mb-4">
@@ -107,5 +100,6 @@ export function Footer() {
           </p>
         </div>
       </div>
-    </footer>;
+    </footer>
+  );
 }
