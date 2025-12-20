@@ -4,11 +4,13 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Shield, ShieldCheck, ShieldAlert, Lock, Eye, Users, Activity,
   CheckCircle2, AlertTriangle, XCircle, Globe, Server, Database,
-  Key, RefreshCw, Clock, TrendingUp, Loader2
+  Key, RefreshCw, Clock, TrendingUp, Loader2, HardDrive
 } from "lucide-react";
+import { BackupManagement } from "./BackupManagement";
 import { supabase } from "@/integrations/supabase/client";
 
 interface SecurityMetric {
@@ -138,9 +140,21 @@ export const SecurityDashboard = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Security Overview Header */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <Tabs defaultValue="overview" className="space-y-6">
+      <TabsList className="grid w-full max-w-md grid-cols-2">
+        <TabsTrigger value="overview" className="gap-2">
+          <Shield className="w-4 h-4" />
+          Security Overview
+        </TabsTrigger>
+        <TabsTrigger value="backups" className="gap-2">
+          <HardDrive className="w-4 h-4" />
+          Backups
+        </TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="overview" className="space-y-6">
+        {/* Security Overview Header */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Overall Security Score */}
         <Card className="lg:col-span-1 bg-gradient-to-br from-green-500/10 to-emerald-500/5 border-green-500/20">
           <CardHeader className="pb-2">
@@ -358,59 +372,64 @@ export const SecurityDashboard = () => {
         </CardContent>
       </Card>
 
-      {/* Security Recommendations */}
-      <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <AlertTriangle className="w-5 h-5 text-yellow-500" />
-            Security Recommendations
-          </CardTitle>
-          <CardDescription>Suggestions to improve your security posture</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[
-              { 
-                title: 'Enable 2FA', 
-                description: 'Add two-factor authentication for admin accounts',
-                priority: 'Medium'
-              },
-              { 
-                title: 'Regular Backups', 
-                description: 'Schedule automated database backups',
-                priority: 'Low'
-              },
-              { 
-                title: 'Audit Logs', 
-                description: 'Enable detailed audit logging for compliance',
-                priority: 'Low'
-              },
-            ].map((rec, index) => (
-              <div 
-                key={index}
-                className="p-4 rounded-lg bg-background/50 border border-border/50"
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className="font-medium text-foreground text-sm">{rec.title}</h4>
-                  <Badge 
-                    variant="outline" 
-                    className={
-                      rec.priority === 'High' 
-                        ? 'bg-red-500/10 text-red-500 border-red-500/30'
-                        : rec.priority === 'Medium'
-                        ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/30'
-                        : 'bg-blue-500/10 text-blue-500 border-blue-500/30'
-                    }
-                  >
-                    {rec.priority}
-                  </Badge>
+        {/* Security Recommendations */}
+        <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <AlertTriangle className="w-5 h-5 text-yellow-500" />
+              Security Recommendations
+            </CardTitle>
+            <CardDescription>Suggestions to improve your security posture</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[
+                { 
+                  title: 'Enable 2FA', 
+                  description: 'Add two-factor authentication for admin accounts',
+                  priority: 'Medium'
+                },
+                { 
+                  title: 'Regular Backups', 
+                  description: 'Schedule automated database backups',
+                  priority: 'Low'
+                },
+                { 
+                  title: 'Audit Logs', 
+                  description: 'Enable detailed audit logging for compliance',
+                  priority: 'Low'
+                },
+              ].map((rec, index) => (
+                <div 
+                  key={index}
+                  className="p-4 rounded-lg bg-background/50 border border-border/50"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-medium text-foreground text-sm">{rec.title}</h4>
+                    <Badge 
+                      variant="outline" 
+                      className={
+                        rec.priority === 'High' 
+                          ? 'bg-red-500/10 text-red-500 border-red-500/30'
+                          : rec.priority === 'Medium'
+                          ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/30'
+                          : 'bg-blue-500/10 text-blue-500 border-blue-500/30'
+                      }
+                    >
+                      {rec.priority}
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground">{rec.description}</p>
                 </div>
-                <p className="text-xs text-muted-foreground">{rec.description}</p>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </TabsContent>
+
+      <TabsContent value="backups">
+        <BackupManagement />
+      </TabsContent>
+    </Tabs>
   );
 };
