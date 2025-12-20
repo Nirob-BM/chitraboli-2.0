@@ -197,6 +197,7 @@ export type Database = {
           rating: number
           review_text: string
           reviewer_name: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -206,6 +207,7 @@ export type Database = {
           rating: number
           review_text: string
           reviewer_name: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -215,6 +217,7 @@ export type Database = {
           rating?: number
           review_text?: string
           reviewer_name?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -262,6 +265,7 @@ export type Database = {
           total_amount: number
         }[]
       }
+      user_has_ordered: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "user"
