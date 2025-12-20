@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Package, Phone, Mail, MapPin, Calendar, ExternalLink, LogOut, Loader2, 
   CreditCard, Smartphone, Banknote, Search, Filter, Trash2, X, BarChart3,
-  MessageSquare, Bell, ShoppingBag
+  MessageSquare, Bell, ShoppingBag, Shield
 } from "lucide-react";
 import { Layout } from "@/components/Layout";
 import { toast } from "sonner";
@@ -28,6 +28,7 @@ import {
 import { OrderStatistics } from "@/components/admin/OrderStatistics";
 import { ContactMessages } from "@/components/admin/ContactMessages";
 import { ProductManagement } from "@/components/admin/ProductManagement";
+import { SecurityDashboard } from "@/components/admin/SecurityDashboard";
 import { useOrderNotifications } from "@/hooks/useOrderNotifications";
 
 interface OrderItem {
@@ -441,7 +442,7 @@ const Admin = () => {
 
           {/* Tabs Navigation */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-flex bg-card/80 backdrop-blur-sm border border-border/50 rounded-xl p-1">
+            <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-flex bg-card/80 backdrop-blur-sm border border-border/50 rounded-xl p-1">
               <TabsTrigger 
                 value="orders" 
                 className="gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
@@ -469,6 +470,13 @@ const Admin = () => {
                 <span className="hidden sm:inline">Statistics</span>
               </TabsTrigger>
               <TabsTrigger 
+                value="security" 
+                className="gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
+                <Shield className="w-4 h-4" />
+                <span className="hidden sm:inline">Security</span>
+              </TabsTrigger>
+              <TabsTrigger 
                 value="messages" 
                 className="gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               >
@@ -484,6 +492,11 @@ const Admin = () => {
                   <ProductManagement />
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            {/* Security Tab */}
+            <TabsContent value="security">
+              <SecurityDashboard />
             </TabsContent>
 
             {/* Orders Tab */}
