@@ -137,6 +137,7 @@ export type Database = {
       products: {
         Row: {
           category: string
+          colors: string[] | null
           created_at: string
           description: string | null
           facebook_post_id: string | null
@@ -146,10 +147,14 @@ export type Database = {
           in_stock: boolean | null
           name: string
           price: number
+          sizes: string[] | null
+          sku: string | null
+          stock_quantity: number | null
           updated_at: string
         }
         Insert: {
           category?: string
+          colors?: string[] | null
           created_at?: string
           description?: string | null
           facebook_post_id?: string | null
@@ -159,10 +164,14 @@ export type Database = {
           in_stock?: boolean | null
           name: string
           price: number
+          sizes?: string[] | null
+          sku?: string | null
+          stock_quantity?: number | null
           updated_at?: string
         }
         Update: {
           category?: string
+          colors?: string[] | null
           created_at?: string
           description?: string | null
           facebook_post_id?: string | null
@@ -172,6 +181,9 @@ export type Database = {
           in_stock?: boolean | null
           name?: string
           price?: number
+          sizes?: string[] | null
+          sku?: string | null
+          stock_quantity?: number | null
           updated_at?: string
         }
         Relationships: []
