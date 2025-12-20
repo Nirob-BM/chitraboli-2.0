@@ -1,5 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { Facebook, Instagram, Mail, Phone, MapPin, MessageCircle } from "lucide-react";
+import { AIAssistant } from "./AIAssistant";
 
 export function Footer() {
   const location = useLocation();
@@ -19,7 +20,7 @@ export function Footer() {
   }
 
   return (
-    <footer className="bg-card border-t border-border">
+    <footer className="bg-card border-t border-border relative">
       <div className="container mx-auto px-4 py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           {/* Brand */}
@@ -94,10 +95,13 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-border mt-12 pt-8 text-center">
+        <div className="border-t border-border mt-12 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-muted-foreground text-sm">
             © {new Date().getFullYear()} Chitraboli চিত্রাবলী. All rights reserved.
           </p>
+          
+          {/* AI Assistant embedded in footer */}
+          <AIAssistant />
         </div>
       </div>
     </footer>
