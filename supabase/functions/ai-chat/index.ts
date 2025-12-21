@@ -11,14 +11,21 @@ serve(async (req) => {
   }
 
   try {
-    const { messages } = await req.json();
+    const { messages, language = "bn" } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    console.log("Processing chat request with messages:", messages.length);
+    console.log("Processing chat request with messages:", messages.length, "language:", language);
+
+    // Language-specific instructions
+    const languageInstructions: Record<string, string> = {
+      bn: `IMPORTANT: You MUST respond in Bengali (বাংলা) language only. Use Bengali script for all responses.`,
+      en: `IMPORTANT: You MUST respond in English language only.`,
+      hi: `IMPORTANT: You MUST respond in Hindi (हिंदी) language only. Use Devanagari script for all responses.`
+    };
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -37,6 +44,8 @@ serve(async (req) => {
 - Sizing and care instructions
 - Gift recommendations
 - General jewelry advice
+
+${languageInstructions[language] || languageInstructions.bn}
 
 ## PRODUCT CATALOG WITH PRICES (in BDT ৳):
 
