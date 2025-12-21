@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { X, Send, Bot, User, Loader2, Sparkles } from "lucide-react";
+import { X, Send, Bot, User, Loader2, Sparkles, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Message {
@@ -7,15 +7,52 @@ interface Message {
   content: string;
 }
 
+type Language = "bn" | "en" | "hi";
+
+const languageConfig = {
+  bn: {
+    name: "বাংলা",
+    flag: "🇧🇩",
+    welcome: "হ্যালো! 👋 চিত্রাবলীতে স্বাগতম! আমি আপনার AI সহায়ক। আজ আমি আপনাকে কীভাবে সাহায্য করতে পারি?",
+    placeholder: "আপনার বার্তা লিখুন...",
+    online: "অনলাইন"
+  },
+  en: {
+    name: "English",
+    flag: "🇬🇧",
+    welcome: "Hello! 👋 Welcome to Chitraboli চিত্রাবলী! I'm your AI assistant. How can I help you today?",
+    placeholder: "Type your message...",
+    online: "Online"
+  },
+  hi: {
+    name: "हिंदी",
+    flag: "🇮🇳",
+    welcome: "नमस्ते! 👋 चित्राबोली में आपका स्वागत है! मैं आपका AI सहायक हूं। आज मैं आपकी कैसे मदद कर सकता हूं?",
+    placeholder: "अपना संदेश लिखें...",
+    online: "ऑनलाइन"
+  }
+};
+
 export const AIAssistant = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [language, setLanguage] = useState<Language>("bn");
+  const [showLanguageMenu, setShowLanguageMenu] = useState(false);
   const [messages, setMessages] = useState<Message[]>([{
     role: "assistant",
-    content: "Hello! 👋 Welcome to Chitraboli চিত্রাবলী! I'm your AI assistant. How can I help you today?"
+    content: languageConfig.bn.welcome
   }]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const handleLanguageChange = (lang: Language) => {
+    setLanguage(lang);
+    setShowLanguageMenu(false);
+    setMessages([{
+      role: "assistant",
+      content: languageConfig[lang].welcome
+    }]);
+  };
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({
@@ -41,6 +78,7 @@ export const AIAssistant = () => {
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`
         },
         body: JSON.stringify({
+          language,
           messages: [...messages, userMessage].map(m => ({
             role: m.role,
             content: m.content
@@ -145,16 +183,45 @@ export const AIAssistant = () => {
                 <h3 className="font-display text-sm text-foreground">Chitraboli AI</h3>
                 <p className="text-xs text-green-400 flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-                  Online
+                  {languageConfig[language].online}
                 </p>
               </div>
             </div>
-            <button
-              onClick={() => setIsOpen(false)}
-              className="w-7 h-7 rounded-full bg-muted/50 flex items-center justify-center hover:bg-muted transition-colors"
-            >
-              <X className="w-4 h-4" />
-            </button>
+            <div className="flex items-center gap-1">
+              {/* Language Selector */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowLanguageMenu(!showLanguageMenu)}
+                  className="w-7 h-7 rounded-full bg-muted/50 flex items-center justify-center hover:bg-muted transition-colors text-xs"
+                  title="Change Language"
+                >
+                  <Globe className="w-3.5 h-3.5" />
+                </button>
+                {showLanguageMenu && (
+                  <div className="absolute right-0 top-full mt-1 bg-card border border-purple-accent/30 rounded-lg shadow-xl z-50 overflow-hidden min-w-[120px]">
+                    {(Object.keys(languageConfig) as Language[]).map((lang) => (
+                      <button
+                        key={lang}
+                        onClick={() => handleLanguageChange(lang)}
+                        className={cn(
+                          "w-full px-3 py-2 text-left text-xs flex items-center gap-2 hover:bg-muted/50 transition-colors",
+                          language === lang && "bg-purple-accent/20 text-purple-accent"
+                        )}
+                      >
+                        <span>{languageConfig[lang].flag}</span>
+                        <span>{languageConfig[lang].name}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <button
+                onClick={() => setIsOpen(false)}
+                className="w-7 h-7 rounded-full bg-muted/50 flex items-center justify-center hover:bg-muted transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
 
@@ -197,7 +264,7 @@ export const AIAssistant = () => {
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => e.key === "Enter" && sendMessage()}
-              placeholder="Type your message..."
+              placeholder={languageConfig[language].placeholder}
               className="flex-1 bg-muted/50 border border-purple-accent/20 rounded-full px-3 py-2 text-xs focus:outline-none focus:border-purple-accent/50 transition-colors"
             />
             <button
