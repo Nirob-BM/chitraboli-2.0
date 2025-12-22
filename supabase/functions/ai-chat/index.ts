@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -13,12 +14,85 @@ serve(async (req) => {
   try {
     const { messages, language = "bn" } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
+    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
     
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
     console.log("Processing chat request with messages:", messages.length, "language:", language);
+
+    // Fetch products from database for auto-sync
+    let productCatalog = "";
+    try {
+      if (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
+        const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+        const { data: products, error } = await supabase
+          .from("products")
+          .select("name, price, category, description, in_stock")
+          .order("category", { ascending: true })
+          .order("name", { ascending: true });
+
+        if (!error && products && products.length > 0) {
+          // Group products by category
+          const grouped: Record<string, typeof products> = {};
+          for (const product of products) {
+            if (!grouped[product.category]) {
+              grouped[product.category] = [];
+            }
+            grouped[product.category].push(product);
+          }
+
+          // Build catalog string
+          productCatalog = "\n\n## LIVE PRODUCT CATALOG (Auto-synced from database):\n\n";
+          for (const [category, items] of Object.entries(grouped)) {
+            productCatalog += `### ${category}:\n`;
+            for (const item of items) {
+              const stockStatus = item.in_stock === false ? " (OUT OF STOCK)" : "";
+              productCatalog += `- "${item.name}" - ৳${item.price.toLocaleString()}${stockStatus}\n`;
+              if (item.description) {
+                productCatalog += `  ${item.description.substring(0, 100)}\n`;
+              }
+            }
+            productCatalog += "\n";
+          }
+          console.log("Loaded", products.length, "products from database");
+        }
+      }
+    } catch (dbError) {
+      console.error("Error fetching products:", dbError);
+      // Continue with hardcoded fallback
+    }
+
+    // Fallback catalog if database fetch fails
+    if (!productCatalog) {
+      productCatalog = `
+
+## PRODUCT CATALOG WITH PRICES (in BDT ৳):
+
+### Clay Jewellery (মাটির গয়না):
+- "বীণা পলাশ" 🌿 - ৳300
+- "রংধনু" 🌈 - ৳349
+- Product 2.0 - ৳250
+
+### Bangles:
+- Crystal Bangles Set - ৳3,800
+- Traditional Bangles - ৳4,500
+
+### Earrings:
+- Elegant Earrings - ৳2,800
+- Pearl Drop Earrings - ৳1,800
+
+### Necklaces:
+- Gold Necklace - ৳12,500
+- Statement Necklace - ৳8,500
+
+### Rings:
+- Rose Gold Ring - ৳4,200
+- Silver Ring - ৳3,200
+`;
+    }
 
     // Language-specific instructions
     const languageInstructions: Record<string, string> = {
@@ -46,29 +120,7 @@ serve(async (req) => {
 - General jewelry advice
 
 ${languageInstructions[language] || languageInstructions.bn}
-
-## PRODUCT CATALOG WITH PRICES (in BDT ৳):
-
-### Clay Jewellery (মাটির গয়না):
-- "বীণা পলাশ" 🌿 - ৳300 (বীণার সুরে, পলাশের রঙে সরস্বতী পুজোর গয়না)
-- "রংধনু" 🌈 - ৳349 (রংধনুর সাত রঙে মিশে আছে জীবনের গল্প)
-- Product 2.0 - ৳250
-
-### Bangles (চুড়ি):
-- Crystal Bangles Set - ৳3,800 (Sparkling crystal bangle set)
-- Traditional Bangles - ৳4,500 (Handmade gold bangles with traditional design)
-
-### Earrings (কানের দুল):
-- Elegant Earrings - ৳2,800 (Handcrafted with intricate gemstone work)
-- Pearl Drop Earrings - ৳1,800 (Delicate pearl drops for everyday elegance)
-
-### Necklaces (গলার হার):
-- Gold Necklace - ৳12,500 (Stunning gold pendant with teardrop design)
-- Statement Necklace - ৳8,500 (Bold statement piece for special occasions)
-
-### Rings (আংটি):
-- Rose Gold Ring - ৳4,200 (Beautiful modern rose gold design)
-- Silver Ring - ৳3,200 (Elegant with gemstone detailing)
+${productCatalog}
 
 IMPORTANT: Always quote prices accurately from this catalog. If a product is not listed, say you'll need to check and suggest contacting us on WhatsApp.
 
