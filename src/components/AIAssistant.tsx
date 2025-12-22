@@ -99,6 +99,19 @@ export const AIAssistant = () => {
     });
   }, [messages]);
 
+  // Cleanup audio on unmount
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
+
   const sendMessage = async (messageText?: string) => {
     const textToSend = messageText || input.trim();
     if (!textToSend || isLoading) return;
@@ -288,11 +301,43 @@ export const AIAssistant = () => {
     }
   };
 
+  const speakWithBrowserTTS = (text: string) => {
+    if (!('speechSynthesis' in window)) {
+      toast.error(language === "bn" ? "এই ব্রাউজারে TTS সাপোর্ট নেই" : language === "hi" ? "इस ब्राउज़र में TTS सपोर्ट नहीं है" : "TTS is not supported in this browser");
+      return;
+    }
+
+    // Cancel any previous speech
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = language === 'bn' ? 'bn-BD' : language === 'hi' ? 'hi-IN' : 'en-US';
+    utterance.rate = 0.95;
+
+    utterance.onend = () => {
+      setIsSpeaking(false);
+      setSpeakingIndex(null);
+    };
+
+    utterance.onerror = () => {
+      setIsSpeaking(false);
+      setSpeakingIndex(null);
+      toast.error(language === "bn" ? "স্পিচ চালাতে সমস্যা" : language === "hi" ? "स्पीच चलाने में समस्या" : "Failed to play speech");
+    };
+
+    window.speechSynthesis.speak(utterance);
+  };
+
   const speakText = async (text: string, messageIndex: number) => {
     // Stop any currently playing audio
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current = null;
+    }
+
+    // Stop any currently speaking browser TTS
+    if ('speechSynthesis' in window && window.speechSynthesis.speaking) {
+      window.speechSynthesis.cancel();
     }
 
     // If clicking the same message that's speaking, stop it
@@ -316,8 +361,36 @@ export const AIAssistant = () => {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to generate speech');
+        // Try to parse JSON error, but don't assume it.
+        let err: any = null;
+        try {
+          err = await response.json();
+        } catch {
+          // ignore
+        }
+
+        const msg = (err?.error as string | undefined) || (language === "bn" ? "ভয়েস সার্ভিস সাময়িকভাবে উপলব্ধ নয়" : language === "hi" ? "वॉयस सेवा अभी उपलब्ध नहीं है" : "Voice service is temporarily unavailable");
+
+        // Specific handling for ElevenLabs free-tier blocks
+        const isUnusualActivity =
+          (err?.code === 'detected_unusual_activity') ||
+          (typeof msg === 'string' && msg.toLowerCase().includes('unusual activity'));
+
+        if (isUnusualActivity) {
+          toast.error(
+            language === "bn"
+              ? "ElevenLabs ফ্রি টিয়ার ব্লক হয়েছে (VPN/প্ল্যান সমস্যা)। বেসিক ভয়েস ব্যবহার করা হচ্ছে।"
+              : language === "hi"
+              ? "ElevenLabs फ्री टियर ब्लॉक है (VPN/प्लान)। बेसिक वॉयस इस्तेमाल हो रहा है।"
+              : "ElevenLabs Free Tier is blocked (VPN/plan). Using basic voice instead."
+          );
+
+          // Fallback: Browser TTS
+          speakWithBrowserTTS(text);
+          return;
+        }
+
+        throw new Error(msg);
       }
 
       // Get audio as blob (binary response)
@@ -344,9 +417,11 @@ export const AIAssistant = () => {
       await audio.play();
     } catch (error) {
       console.error('TTS error:', error);
-      setIsSpeaking(false);
-      setSpeakingIndex(null);
-      toast.error(language === "bn" ? "স্পিচ তৈরি করতে সমস্যা" : language === "hi" ? "स्पीच बनाने में समस्या" : "Failed to generate speech");
+
+      // Last-resort fallback for any other error
+      setIsSpeaking(true);
+      setSpeakingIndex(messageIndex);
+      speakWithBrowserTTS(text);
     }
   };
 
