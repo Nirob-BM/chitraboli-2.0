@@ -1,6 +1,7 @@
-import { useState, useRef, useEffect } from "react";
-import { X, Send, Bot, User, Loader2, Sparkles, Globe } from "lucide-react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { X, Send, Bot, User, Loader2, Sparkles, Globe, Mic, MicOff } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface Message {
   role: "user" | "assistant";
@@ -15,21 +16,27 @@ const languageConfig = {
     flag: "🇧🇩",
     welcome: "হ্যালো! 👋 চিত্রাবলীতে স্বাগতম! আমি আপনার AI সহায়ক। আজ আমি আপনাকে কীভাবে সাহায্য করতে পারি?",
     placeholder: "আপনার বার্তা লিখুন...",
-    online: "অনলাইন"
+    online: "অনলাইন",
+    listening: "শুনছি...",
+    processing: "প্রক্রিয়াকরণ..."
   },
   en: {
     name: "English",
     flag: "🇬🇧",
     welcome: "Hello! 👋 Welcome to Chitraboli চিত্রাবলী! I'm your AI assistant. How can I help you today?",
     placeholder: "Type your message...",
-    online: "Online"
+    online: "Online",
+    listening: "Listening...",
+    processing: "Processing..."
   },
   hi: {
     name: "हिंदी",
     flag: "🇮🇳",
     welcome: "नमस्ते! 👋 चित्राबोली में आपका स्वागत है! मैं आपका AI सहायक हूं। आज मैं आपकी कैसे मदद कर सकता हूं?",
     placeholder: "अपना संदेश लिखें...",
-    online: "ऑनलाइन"
+    online: "ऑनलाइन",
+    listening: "सुन रहा हूं...",
+    processing: "प्रोसेसिंग..."
   }
 };
 
@@ -43,7 +50,11 @@ export const AIAssistant = () => {
   }]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isProcessingVoice, setIsProcessingVoice] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
 
   const handleLanguageChange = (lang: Language) => {
     setLanguage(lang);
@@ -60,16 +71,19 @@ export const AIAssistant = () => {
     });
   }, [messages]);
 
-  const sendMessage = async () => {
-    if (!input.trim() || isLoading) return;
+  const sendMessage = async (messageText?: string) => {
+    const textToSend = messageText || input.trim();
+    if (!textToSend || isLoading) return;
+    
     const userMessage: Message = {
       role: "user",
-      content: input.trim()
+      content: textToSend
     };
     setMessages(prev => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
     let assistantContent = "";
+    
     try {
       const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-chat`, {
         method: "POST",
@@ -85,26 +99,26 @@ export const AIAssistant = () => {
           }))
         })
       });
+      
       if (!response.ok) {
         throw new Error("Failed to get response");
       }
+      
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
       if (!reader) throw new Error("No reader");
+      
       setMessages(prev => [...prev, {
         role: "assistant",
         content: ""
       }]);
+      
       while (true) {
-        const {
-          done,
-          value
-        } = await reader.read();
+        const { done, value } = await reader.read();
         if (done) break;
-        const chunk = decoder.decode(value, {
-          stream: true
-        });
+        const chunk = decoder.decode(value, { stream: true });
         const lines = chunk.split("\n");
+        
         for (const line of lines) {
           if (line.startsWith("data: ")) {
             const data = line.slice(6).trim();
@@ -133,10 +147,116 @@ export const AIAssistant = () => {
       console.error("Chat error:", error);
       setMessages(prev => [...prev, {
         role: "assistant",
-        content: "I apologize, but I'm having trouble responding right now. Please try again or contact us via WhatsApp."
+        content: language === "bn" 
+          ? "দুঃখিত, এখন সাড়া দিতে সমস্যা হচ্ছে। অনুগ্রহ করে আবার চেষ্টা করুন বা WhatsApp-এ যোগাযোগ করুন।"
+          : language === "hi"
+          ? "क्षमा करें, अभी जवाब देने में समस्या हो रही है। कृपया पुनः प्रयास करें या WhatsApp पर संपर्क करें।"
+          : "I apologize, but I'm having trouble responding right now. Please try again or contact us via WhatsApp."
       }]);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const startRecording = useCallback(async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true
+        } 
+      });
+      
+      const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+      
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+      
+      mediaRecorder.onstop = async () => {
+        stream.getTracks().forEach(track => track.stop());
+        
+        if (audioChunksRef.current.length === 0) return;
+        
+        setIsProcessingVoice(true);
+        
+        try {
+          const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+          
+          // Convert to base64
+          const reader = new FileReader();
+          reader.readAsDataURL(audioBlob);
+          
+          reader.onloadend = async () => {
+            const base64Audio = (reader.result as string).split(',')[1];
+            
+            try {
+              const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/voice-to-text`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`
+                },
+                body: JSON.stringify({ audio: base64Audio, language })
+              });
+              
+              if (!response.ok) {
+                throw new Error('Failed to transcribe audio');
+              }
+              
+              const { text, error } = await response.json();
+              
+              if (error) {
+                throw new Error(error);
+              }
+              
+              if (text && text.trim()) {
+                setInput(text);
+                // Auto-send the transcribed message
+                await sendMessage(text);
+              } else {
+                toast.error(language === "bn" ? "কোনো কথা বোঝা যায়নি" : language === "hi" ? "कोई बात समझ नहीं आई" : "Could not understand speech");
+              }
+            } catch (error) {
+              console.error('Transcription error:', error);
+              toast.error(language === "bn" ? "ভয়েস প্রসেস করতে সমস্যা" : language === "hi" ? "आवाज प्रोसेस करने में समस्या" : "Failed to process voice");
+            } finally {
+              setIsProcessingVoice(false);
+            }
+          };
+        } catch (error) {
+          console.error('Audio processing error:', error);
+          setIsProcessingVoice(false);
+          toast.error("Failed to process audio");
+        }
+      };
+      
+      mediaRecorder.start();
+      setIsRecording(true);
+      
+    } catch (error) {
+      console.error('Microphone access error:', error);
+      toast.error(language === "bn" ? "মাইক্রোফোন অ্যাক্সেস দিন" : language === "hi" ? "माइक्रोफोन एक्सेस दें" : "Please allow microphone access");
+    }
+  }, [language]);
+
+  const stopRecording = useCallback(() => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  }, [isRecording]);
+
+  const toggleRecording = () => {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      startRecording();
     }
   };
 
@@ -183,7 +303,11 @@ export const AIAssistant = () => {
                 <h3 className="font-display text-sm text-foreground">Chitraboli AI</h3>
                 <p className="text-xs text-green-400 flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-                  {languageConfig[language].online}
+                  {isRecording 
+                    ? languageConfig[language].listening 
+                    : isProcessingVoice 
+                    ? languageConfig[language].processing 
+                    : languageConfig[language].online}
                 </p>
               </div>
             </div>
@@ -259,6 +383,30 @@ export const AIAssistant = () => {
         {/* Input */}
         <div className="p-3 border-t border-purple-accent/20">
           <div className="flex gap-2">
+            {/* Voice Input Button */}
+            <button
+              onClick={toggleRecording}
+              disabled={isLoading || isProcessingVoice}
+              className={cn(
+                "w-8 h-8 rounded-full flex items-center justify-center transition-all",
+                isRecording 
+                  ? "bg-red-500 animate-pulse" 
+                  : isProcessingVoice
+                  ? "bg-yellow-500"
+                  : "bg-muted/50 hover:bg-purple-accent/30",
+                (isLoading || isProcessingVoice) && "opacity-50 cursor-not-allowed"
+              )}
+              title={isRecording ? "Stop recording" : "Voice input"}
+            >
+              {isRecording ? (
+                <MicOff className="w-3.5 h-3.5 text-white" />
+              ) : isProcessingVoice ? (
+                <Loader2 className="w-3.5 h-3.5 text-white animate-spin" />
+              ) : (
+                <Mic className="w-3.5 h-3.5 text-foreground" />
+              )}
+            </button>
+            
             <input
               type="text"
               value={input}
@@ -266,10 +414,11 @@ export const AIAssistant = () => {
               onKeyDown={e => e.key === "Enter" && sendMessage()}
               placeholder={languageConfig[language].placeholder}
               className="flex-1 bg-muted/50 border border-purple-accent/20 rounded-full px-3 py-2 text-xs focus:outline-none focus:border-purple-accent/50 transition-colors"
+              disabled={isRecording || isProcessingVoice}
             />
             <button
-              onClick={sendMessage}
-              disabled={!input.trim() || isLoading}
+              onClick={() => sendMessage()}
+              disabled={!input.trim() || isLoading || isRecording || isProcessingVoice}
               className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-accent to-gold flex items-center justify-center disabled:opacity-50 transition-opacity"
             >
               <Send className="w-3.5 h-3.5 text-white" />
