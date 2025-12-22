@@ -38,7 +38,7 @@ serve(async (req) => {
         },
         body: JSON.stringify({
           text: text.substring(0, 5000), // ElevenLabs limit
-          model_id: 'eleven_multilingual_v2', // Supports 29 languages including Bengali and Hindi
+          model_id: 'eleven_multilingual_v2',
           output_format: 'mp3_44100_128',
           voice_settings: {
             stability: 0.5,
@@ -51,14 +51,31 @@ serve(async (req) => {
     );
 
     if (!response.ok) {
-      const error = await response.json();
-      console.error('ElevenLabs TTS error:', error);
-      throw new Error(error.detail?.message || 'Failed to generate speech');
+      let errJson: any = null;
+      try {
+        errJson = await response.json();
+      } catch {
+        // ignore
+      }
+
+      console.error('ElevenLabs TTS error:', errJson ?? (await response.text()));
+
+      const code = errJson?.detail?.status as string | undefined;
+      const message = (errJson?.detail?.message || errJson?.message || 'Failed to generate speech') as string;
+
+      // ElevenLabs may disable Free Tier due to unusual activity.
+      // Return a distinct status so the client can gracefully fall back.
+      const status = code === 'detected_unusual_activity' ? 402 : response.status;
+
+      return new Response(JSON.stringify({ error: message, code }), {
+        status,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     // Return the audio directly as binary
     const audioBuffer = await response.arrayBuffer();
-    
+
     console.log('ElevenLabs TTS generated successfully, audio size:', audioBuffer.byteLength);
 
     return new Response(audioBuffer, {
