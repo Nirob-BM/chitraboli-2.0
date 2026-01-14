@@ -175,9 +175,10 @@ export function ProfileWishlist() {
                     disabled={!product.in_stock}
                     onClick={() => {
                       addItem({
-                        name: product.name,
-                        price: product.price,
-                        image: product.image_url || undefined
+                        product_id: product.id,
+                        product_name: product.name,
+                        product_price: product.price,
+                        product_image: product.image_url || ""
                       });
                     }}
                   >
