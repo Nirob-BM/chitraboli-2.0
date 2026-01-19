@@ -63,7 +63,7 @@ export function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-display text-lg font-semibold text-foreground mb-4">Quick Links</h4>
+            <h2 className="font-display text-lg font-semibold text-foreground mb-4">Quick Links</h2>
             <ul className="space-y-3">
               {[
                 { label: "Shop", path: "/shop" },
@@ -83,7 +83,7 @@ export function Footer() {
 
           {/* Contact */}
           <div>
-            <h4 className="font-display text-lg font-semibold text-foreground mb-4">Contact Us</h4>
+            <h2 className="font-display text-lg font-semibold text-foreground mb-4">Contact Us</h2>
             <ul className="space-y-3">
               <li className="flex items-center gap-3 text-muted-foreground text-sm">
                 <Phone className="h-4 w-4 text-primary" />
