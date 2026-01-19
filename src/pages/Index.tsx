@@ -90,9 +90,9 @@ const Index = () => {
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 text-primary mb-6 group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-500">
                   <feature.icon className="h-8 w-8" />
                 </div>
-                <h3 className="font-display text-xl font-semibold text-foreground mb-2">
+                <h2 className="font-display text-xl font-semibold text-foreground mb-2">
                   {feature.title}
-                </h3>
+                </h2>
                 <p className="text-muted-foreground text-sm">
                   {feature.description}
                 </p>
