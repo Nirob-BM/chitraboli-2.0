@@ -9,6 +9,15 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+function escapeHtml(str: unknown): string {
+  return String(str ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
+
 interface OrderItem {
   name: string;
   price: number;
@@ -147,9 +156,9 @@ const handler = async (req: Request): Promise<Response> => {
     
     const itemsHtml = items
       .map(item => `<tr>
-        <td style="padding: 8px; border-bottom: 1px solid #eee;">${item.name}</td>
-        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">x${item.quantity}</td>
-        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">৳${item.price.toLocaleString()}</td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee;">${escapeHtml(item.name)}</td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">x${Number(item.quantity) || 0}</td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">৳${(Number(item.price) || 0).toLocaleString()}</td>
       </tr>`)
       .join('');
 
@@ -158,10 +167,10 @@ const handler = async (req: Request): Promise<Response> => {
       <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid ${paymentColor};">
         <p style="margin: 0 0 8px 0; font-weight: bold; color: #333;">Payment Details</p>
         <p style="margin: 0; color: #555;">
-          <strong>Method:</strong> ${paymentLabel}
+          <strong>Method:</strong> ${escapeHtml(paymentLabel)}
         </p>
         ${transactionId ? `<p style="margin: 5px 0 0 0; color: #555;">
-          <strong>Transaction ID:</strong> <code style="background: #e0e0e0; padding: 2px 6px; border-radius: 4px; font-family: monospace;">${transactionId}</code>
+          <strong>Transaction ID:</strong> <code style="background: #e0e0e0; padding: 2px 6px; border-radius: 4px; font-family: monospace;">${escapeHtml(transactionId)}</code>
         </p>` : ''}
         ${paymentMethod === 'cod' ? `<p style="margin: 5px 0 0 0; color: #888; font-size: 12px;">Payment will be collected upon delivery</p>` : ''}
       </div>
@@ -187,13 +196,13 @@ const handler = async (req: Request): Promise<Response> => {
           <div style="background: #ffffff; padding: 30px; border: 1px solid #e0e0e0; border-top: none;">
             <div style="text-align: center; font-size: 48px; margin-bottom: 20px;">${emoji}</div>
             
-            <h2 style="color: #1a1a2e; margin-top: 0;">Hello ${customerName},</h2>
+            <h2 style="color: #1a1a2e; margin-top: 0;">Hello ${escapeHtml(customerName)},</h2>
             
-            <p style="font-size: 16px; color: #555;">${message}</p>
+            <p style="font-size: 16px; color: #555;">${escapeHtml(message)}</p>
             
             <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin: 20px 0;">
               <p style="margin: 0 0 10px 0; color: #888; font-size: 14px;">Order ID</p>
-              <p style="margin: 0; font-family: monospace; font-size: 16px; color: #1a1a2e;">#${orderId.slice(0, 8).toUpperCase()}</p>
+              <p style="margin: 0; font-family: monospace; font-size: 16px; color: #1a1a2e;">#${escapeHtml(String(orderId).slice(0, 8).toUpperCase())}</p>
             </div>
 
             ${paymentHtml}
