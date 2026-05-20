@@ -21,9 +21,9 @@ export const useProducts = () => {
   useEffect(() => {
     fetchProducts();
 
-    // Subscribe to realtime updates
+    // Subscribe to realtime updates (unique channel name to avoid re-subscribe conflicts in StrictMode)
     const channel = supabase
-      .channel('products-public')
+      .channel(`products-public-${Math.random().toString(36).slice(2)}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, () => {
         fetchProducts();
       })
