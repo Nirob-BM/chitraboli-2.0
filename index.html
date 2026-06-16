@@ -37,6 +37,20 @@
 
   <body>
     <div id="root"></div>
+    <script>
+      // Always start at the top on initial load / refresh.
+      // Disable the browser's automatic scroll restoration so it
+      // doesn't jump back to the previous scroll position.
+      if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+      }
+      window.addEventListener('beforeunload', function () {
+        window.scrollTo(0, 0);
+      });
+      window.addEventListener('load', function () {
+        window.scrollTo(0, 0);
+      });
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
