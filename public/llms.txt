@@ -1,0 +1,12 @@
+# Chitraboli চিত্রাবলী
+
+> Chitraboli is a handmade jewellery brand from Bangladesh creating rings, necklaces, earrings and bangles inspired by art, tradition and passion.
+
+## Pages
+
+- [Home](/): Brand introduction, featured collections, and new arrivals.
+- [Shop](/shop): Browse all handmade jewellery with search and filters.
+- [Collections](/collections): Curated jewellery collections by theme.
+- [About](/about): The story of Chitraboli and its artisans.
+- [Contact](/contact): Customer support and inquiries.
+- [Track Order](/track-order): Look up an existing order by ID and phone.
