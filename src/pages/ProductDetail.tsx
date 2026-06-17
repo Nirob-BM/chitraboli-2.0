@@ -282,14 +282,16 @@ const ProductDetail = () => {
                         size="icon"
                         onClick={() => setQuantity(Math.max(1, quantity - 1))}
                         disabled={quantity <= 1}
+                        aria-label="Decrease quantity"
                       >
                         <Minus className="h-4 w-4" />
                       </Button>
-                      <span className="w-12 text-center font-medium text-lg">{quantity}</span>
+                      <span className="w-12 text-center font-medium text-lg" aria-live="polite">{quantity}</span>
                       <Button
                         variant="outline"
                         size="icon"
                         onClick={() => setQuantity(quantity + 1)}
+                        aria-label="Increase quantity"
                       >
                         <Plus className="h-4 w-4" />
                       </Button>

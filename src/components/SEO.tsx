@@ -14,8 +14,9 @@ interface SEOProps {
 const SITE_ORIGIN = "https://chitraboli.lovable.app";
 const DEFAULT_TITLE = "Chitraboli চিত্রাবলী - Handmade Jewellery with Love";
 const DEFAULT_DESCRIPTION =
-  "Chitraboli creates handmade jewellery inspired by art, tradition and passion. Discover unique rings, necklaces, earrings and bangles crafted with love in Bangladesh.";
-const DEFAULT_IMAGE = "https://lovable.dev/opengraph-image-p98pqg.png";
+  "Handmade jewellery from Bangladesh — unique rings, necklaces, earrings & bangles crafted with love by Chitraboli artisans.";
+const DEFAULT_IMAGE =
+  "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/96110fad-0606-4610-a360-41ee1d1eb0aa";
 
 export const SEO = ({
   title,
