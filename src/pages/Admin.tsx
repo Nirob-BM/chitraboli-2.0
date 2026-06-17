@@ -147,20 +147,14 @@ const Admin = () => {
   useEffect(() => {
     if (isAdmin) {
       fetchOrders();
-      
-      const channel = supabase
-        .channel('orders-channel')
-        .on(
-          'postgres_changes',
-          { event: '*', schema: 'public', table: 'orders' },
-          () => {
-            fetchOrders();
-          }
-        )
-        .subscribe();
+      // Realtime broadcasts on `orders` are disabled to avoid leaking customer PII to all subscribers.
+      // Poll on an interval instead — RLS keeps the data admin-only.
+      const interval = setInterval(() => {
+        fetchOrders();
+      }, 20000);
 
       return () => {
-        supabase.removeChannel(channel);
+        clearInterval(interval);
       };
     }
   }, [isAdmin]);
