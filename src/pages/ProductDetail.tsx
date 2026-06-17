@@ -154,6 +154,29 @@ const ProductDetail = () => {
             </div>
           ) : (
             <>
+              <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                  __html: JSON.stringify({
+                    "@context": "https://schema.org",
+                    "@type": "Product",
+                    name: product.name,
+                    image: images,
+                    description: product.description || undefined,
+                    category: product.category,
+                    brand: { "@type": "Brand", name: "Chitraboli" },
+                    offers: {
+                      "@type": "Offer",
+                      price: product.price,
+                      priceCurrency: "BDT",
+                      availability: product.in_stock
+                        ? "https://schema.org/InStock"
+                        : "https://schema.org/OutOfStock",
+                      url: `https://chitraboli.lovable.app/product/${product.id}`,
+                    },
+                  }),
+                }}
+              />
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
                 {/* Image Gallery */}
                 <div className="space-y-4">
