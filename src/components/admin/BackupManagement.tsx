@@ -51,8 +51,8 @@ export const BackupManagement = () => {
     try {
       // Fetch backup records from storage
       const { data: files, error } = await supabase.storage
-        .from('products')
-        .list('backups', { limit: 20, sortBy: { column: 'created_at', order: 'desc' } });
+        .from('backups')
+        .list('', { limit: 20, sortBy: { column: 'created_at', order: 'desc' } });
 
       if (error) {
         console.error('Error fetching backups:', error);
@@ -192,8 +192,8 @@ export const BackupManagement = () => {
 
       // Try to upload to storage
       const { error: uploadError } = await supabase.storage
-        .from('products')
-        .upload(`backups/${fileName}`, blob, { upsert: true });
+        .from('backups')
+        .upload(fileName, blob, { upsert: true });
 
       if (uploadError) {
         console.error('Storage upload error:', uploadError);
@@ -236,8 +236,8 @@ export const BackupManagement = () => {
       }
 
       const { data, error } = await supabase.storage
-        .from('products')
-        .download(`backups/${backup.name}`);
+        .from('backups')
+        .download(backup.name);
 
       if (error) {
         throw error;
@@ -277,8 +277,8 @@ export const BackupManagement = () => {
       }
 
       const { data, error } = await supabase.storage
-        .from('products')
-        .download(`backups/${backup.name}`);
+        .from('backups')
+        .download(backup.name);
 
       if (error) throw error;
 
@@ -315,8 +315,8 @@ export const BackupManagement = () => {
 
     try {
       const { error } = await supabase.storage
-        .from('products')
-        .remove([`backups/${backup.name}`]);
+        .from('backups')
+        .remove([backup.name]);
 
       if (error) throw error;
 

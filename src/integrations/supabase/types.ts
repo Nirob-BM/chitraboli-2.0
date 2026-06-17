@@ -1102,12 +1102,31 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_log_profile_audit: {
+        Args: {
+          _action: string
+          _field_changed?: string
+          _new_value?: string
+          _old_value?: string
+          _target_user_id: string
+        }
+        Returns: string
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      log_self_profile_audit: {
+        Args: {
+          _action: string
+          _field_changed?: string
+          _new_value?: string
+          _old_value?: string
+        }
+        Returns: string
       }
       track_order: {
         Args: { order_id: string; phone_number: string }

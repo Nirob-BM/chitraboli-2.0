@@ -416,12 +416,11 @@ export function useUserProfile() {
 
     try {
       // Log the deactivation request
-      await supabase.from('profile_audit_logs').insert({
-        user_id: user.id,
-        action: 'deactivation_request',
-        field_changed: 'account_status',
-        new_value: reason,
-        changed_by: user.id
+      await supabase.rpc('log_self_profile_audit', {
+        _action: 'deactivation_request',
+        _field_changed: 'account_status',
+        _old_value: null,
+        _new_value: reason,
       });
 
       // Update profile status
