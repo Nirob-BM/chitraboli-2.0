@@ -39,32 +39,48 @@ export const useOrderNotifications = (isAdmin: boolean) => {
   useEffect(() => {
     if (!isAdmin) return;
 
-    const channel = supabase
-      .channel('admin-order-notifications')
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'orders' },
-        (payload) => {
-          const newOrder = payload.new as { id: string; customer_name: string };
-          
-          // Prevent duplicate notifications
-          if (lastOrderIdRef.current === newOrder.id) return;
-          lastOrderIdRef.current = newOrder.id;
-          
-          // Play sound and show notification
-          playNotificationSound();
-          setNewOrderCount(prev => prev + 1);
-          
-          toast.success(`New Order!`, {
-            description: `Order from ${newOrder.customer_name}`,
-            duration: 5000,
-          });
-        }
-      )
-      .subscribe();
+    let cancelled = false;
+
+    // Seed the lastOrderId baseline so we only alert on truly new orders
+    const seed = async () => {
+      const { data } = await supabase
+        .from('orders')
+        .select('id')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (!cancelled && data?.id) {
+        lastOrderIdRef.current = data.id;
+      }
+    };
+
+    const poll = async () => {
+      const { data, error } = await supabase
+        .from('orders')
+        .select('id, customer_name')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (cancelled || error || !data) return;
+      if (lastOrderIdRef.current && data.id !== lastOrderIdRef.current) {
+        lastOrderIdRef.current = data.id;
+        playNotificationSound();
+        setNewOrderCount(prev => prev + 1);
+        toast.success(`New Order!`, {
+          description: `Order from ${data.customer_name}`,
+          duration: 5000,
+        });
+      } else if (!lastOrderIdRef.current) {
+        lastOrderIdRef.current = data.id;
+      }
+    };
+
+    seed();
+    const interval = setInterval(poll, 15000);
 
     return () => {
-      supabase.removeChannel(channel);
+      cancelled = true;
+      clearInterval(interval);
     };
   }, [isAdmin]);
 

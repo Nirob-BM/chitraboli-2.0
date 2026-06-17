@@ -93,43 +93,44 @@ const DeliveryMap: React.FC<DeliveryMapProps> = ({
     fetchRiderLocation();
   }, [riderId]);
 
-  // Subscribe to real-time location updates
+  // Poll for rider location updates (Realtime broadcasts on `delivery_riders`
+  // are disabled to avoid leaking rider PII / GPS to all subscribers).
   useEffect(() => {
-    const channel = supabase
-      .channel(`rider-location-${riderId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'delivery_riders',
-          filter: `id=eq.${riderId}`
-        },
-        (payload) => {
-          const newData = payload.new as any;
-          if (newData.current_latitude && newData.current_longitude) {
-            const newLocation = {
-              latitude: parseFloat(newData.current_latitude),
-              longitude: parseFloat(newData.current_longitude),
-              updatedAt: newData.location_updated_at
-            };
-            setRiderLocation(newLocation);
+    if (!riderId) return;
+    let cancelled = false;
 
-            // Update marker position
-            if (marker.current && map.current) {
-              marker.current.setLngLat([newLocation.longitude, newLocation.latitude]);
-              map.current.flyTo({
-                center: [newLocation.longitude, newLocation.latitude],
-                duration: 1000
-              });
-            }
+    const fetchLatest = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('delivery_riders')
+          .select('current_latitude, current_longitude, location_updated_at')
+          .eq('id', riderId)
+          .maybeSingle();
+        if (cancelled || error || !data) return;
+        if (data.current_latitude && data.current_longitude) {
+          const newLocation = {
+            latitude: parseFloat(String(data.current_latitude)),
+            longitude: parseFloat(String(data.current_longitude)),
+            updatedAt: data.location_updated_at,
+          };
+          setRiderLocation(newLocation);
+          if (marker.current && map.current) {
+            marker.current.setLngLat([newLocation.longitude, newLocation.latitude]);
+            map.current.flyTo({
+              center: [newLocation.longitude, newLocation.latitude],
+              duration: 1000,
+            });
           }
         }
-      )
-      .subscribe();
+      } catch (err) {
+        console.error('Error polling rider location:', err);
+      }
+    };
 
+    const interval = setInterval(fetchLatest, 5000);
     return () => {
-      supabase.removeChannel(channel);
+      cancelled = true;
+      clearInterval(interval);
     };
   }, [riderId]);
 
