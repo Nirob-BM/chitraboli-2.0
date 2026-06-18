@@ -32,51 +32,35 @@ export function useRateLimit(options: RateLimitOptions): RateLimitResult {
   const [attempts, setAttempts] = useState<number[]>([]);
   const windowStartRef = useRef<number>(Date.now());
 
-  const cleanOldAttempts = useCallback(() => {
-    const now = Date.now();
-    const cutoff = now - windowMs;
-    
-    setAttempts((prev) => {
-      const filtered = prev.filter((timestamp) => timestamp > cutoff);
-      if (filtered.length === 0) {
-        windowStartRef.current = now;
-      }
-      return filtered;
-    });
-  }, [windowMs]);
-
-  const isAllowed = useCallback(() => {
-    cleanOldAttempts();
-    return attempts.length < maxAttempts;
-  }, [attempts, maxAttempts, cleanOldAttempts]);
-
-  const remainingAttempts = Math.max(0, maxAttempts - attempts.length);
-
-  const timeUntilReset = useCallback(() => {
-    if (attempts.length === 0) return 0;
-    const oldestAttempt = Math.min(...attempts);
-    const resetTime = oldestAttempt + windowMs;
-    return Math.max(0, resetTime - Date.now());
+  const getActiveAttempts = useCallback(() => {
+    const cutoff = Date.now() - windowMs;
+    return attempts.filter((timestamp) => timestamp > cutoff);
   }, [attempts, windowMs]);
+
+  const activeAttempts = getActiveAttempts();
+  const isAllowed = activeAttempts.length < maxAttempts;
+  const remainingAttempts = Math.max(0, maxAttempts - activeAttempts.length);
+  const timeUntilReset =
+    activeAttempts.length === 0
+      ? 0
+      : Math.max(0, Math.min(...activeAttempts) + windowMs - Date.now());
 
   const executeWithLimit = useCallback(
     async <T>(action: () => Promise<T> | T): Promise<T | null> => {
-      cleanOldAttempts();
-      
-      if (attempts.length >= maxAttempts) {
+      const now = Date.now();
+      const cutoff = now - windowMs;
+      const current = attempts.filter((t) => t > cutoff);
+
+      if (current.length >= maxAttempts) {
         onRateLimitExceeded?.();
         return null;
       }
 
-      setAttempts((prev) => [...prev, Date.now()]);
-      
-      try {
-        return await action();
-      } catch (error) {
-        throw error;
-      }
+      setAttempts([...current, now]);
+
+      return await action();
     },
-    [attempts, maxAttempts, cleanOldAttempts, onRateLimitExceeded]
+    [attempts, maxAttempts, windowMs, onRateLimitExceeded]
   );
 
   const reset = useCallback(() => {
@@ -85,10 +69,11 @@ export function useRateLimit(options: RateLimitOptions): RateLimitResult {
   }, []);
 
   return {
-    isAllowed: isAllowed(),
+    isAllowed,
     remainingAttempts,
     executeWithLimit,
     reset,
-    timeUntilReset: timeUntilReset(),
+    timeUntilReset,
   };
 }
+
