@@ -40,7 +40,7 @@ export default function Trust() {
       <SEO
         title="Trust & Security — Chitraboli"
         description="How Chitraboli protects your data, secures your orders, and respects your privacy."
-        canonical="/trust"
+        url="/trust"
       />
       <div className="container mx-auto px-4 py-16 max-w-4xl">
         <header className="text-center mb-12">
