@@ -74,6 +74,7 @@ export function Footer() {
                 { label: "About Us", path: "/about" },
                 { label: "Contact", path: "/contact" },
                 { label: "Track Order", path: "/track-order" },
+                { label: "Trust & Security", path: "/trust" },
               ].map((item) => (
                 <li key={item.label}>
                   <Link to={item.path} className="text-muted-foreground text-sm hover:text-primary transition-colors">
