@@ -28,6 +28,9 @@ const ProductDetail = lazy(() => import("./pages/ProductDetail"));
 const Profile = lazy(() => import("./pages/Profile"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Trust = lazy(() => import("./pages/Trust"));
+const BlogIdentifyingHandcraftedJewelry = lazy(
+  () => import("./pages/BlogIdentifyingHandcraftedJewelry")
+);
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -62,6 +65,10 @@ const AppContent = () => {
             <Route path="/admin" element={<ProtectedRoute requireAdmin><Admin /></ProtectedRoute>} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/trust" element={<Trust />} />
+            <Route
+              path="/blog/identifying-handcrafted-jewelry"
+              element={<BlogIdentifyingHandcraftedJewelry />}
+            />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

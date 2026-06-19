@@ -22,6 +22,12 @@ const staticEntries: SitemapEntry[] = [
   { path: "/about", changefreq: "monthly", priority: "0.6" },
   { path: "/contact", changefreq: "monthly", priority: "0.6" },
   { path: "/track-order", changefreq: "monthly", priority: "0.4" },
+  { path: "/trust", changefreq: "monthly", priority: "0.5" },
+  {
+    path: "/blog/identifying-handcrafted-jewelry",
+    changefreq: "monthly",
+    priority: "0.7",
+  },
 ];
 
 async function fetchProductEntries(): Promise<SitemapEntry[]> {
