@@ -72,8 +72,9 @@ export const ProductCard = React.forwardRef<HTMLDivElement, ProductCardProps>(
                   onClick={(e) => handleActionClick(e, () => setShow3DViewer(true))}
                   className="h-9 w-9 bg-background/90 backdrop-blur border-primary/30 hover:bg-primary hover:text-primary-foreground"
                   title="360° View"
+                  aria-label="360 degree view"
                 >
-                  <View className="h-4 w-4" />
+                  <View className="h-4 w-4" aria-hidden="true" />
                 </Button>
                 <Button
                   variant="outline"
@@ -81,8 +82,9 @@ export const ProductCard = React.forwardRef<HTMLDivElement, ProductCardProps>(
                   onClick={(e) => handleActionClick(e, () => setShowARTryOn(true))}
                   className="h-9 w-9 bg-background/90 backdrop-blur border-primary/30 hover:bg-primary hover:text-primary-foreground"
                   title="Virtual Try-On"
+                  aria-label="Virtual try-on"
                 >
-                  <Sparkles className="h-4 w-4" />
+                  <Sparkles className="h-4 w-4" aria-hidden="true" />
                 </Button>
               </div>
 

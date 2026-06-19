@@ -37,7 +37,7 @@ const Index = () => {
         {/* Content */}
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
           <h1 className="font-display text-5xl md:text-7xl lg:text-8xl font-light text-foreground mb-4 animate-fade-up">
-            Handmade with{" "}
+            Handcrafted Jewellery — Handmade with{" "}
             <span className="text-gold font-medium">Love</span>
           </h1>
           <p className="font-display text-xl md:text-2xl text-muted-foreground mb-8 animate-fade-up" style={{
