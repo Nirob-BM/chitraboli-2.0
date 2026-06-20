@@ -18,11 +18,14 @@ const Index = () => {
       <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden gradient-hero">
         {/* Background Image */}
         <div className="absolute inset-0">
-          <img 
-            src={heroImage} 
-            alt="Handmade jewelry" 
+          <img
+            src={heroImage}
+            alt="Handmade jewelry"
+            width={1920}
+            height={1080}
             className="w-full h-full object-cover opacity-40"
             fetchPriority="high"
+            loading="eager"
             decoding="async"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background" />
