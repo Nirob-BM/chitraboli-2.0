@@ -96,9 +96,13 @@ export const AIAssistant = () => {
   };
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({
-      behavior: "smooth"
-    });
+    // Only auto-scroll within the chat container, never the whole window.
+    const el = messagesEndRef.current;
+    if (!el) return;
+    const scrollParent = el.closest('[data-radix-scroll-area-viewport], .overflow-y-auto, .overflow-auto') as HTMLElement | null;
+    if (scrollParent) {
+      scrollParent.scrollTop = scrollParent.scrollHeight;
+    }
   }, [messages]);
 
   // Cleanup audio on unmount
