@@ -31,6 +31,16 @@
     <priority>0.4</priority>
   </url>
   <url>
+    <loc>https://chitraboli.lovable.app/trust</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://chitraboli.lovable.app/blog/identifying-handcrafted-jewelry</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://chitraboli.lovable.app/product/ad5246a7-9661-49da-9973-0941352c2caa</loc>
     <lastmod>2026-01-06</lastmod>
     <changefreq>weekly</changefreq>
