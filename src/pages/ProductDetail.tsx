@@ -174,7 +174,10 @@ const ProductDetail = () => {
                         : "https://schema.org/OutOfStock",
                       url: `https://chitraboli.lovable.app/product/${product.id}`,
                     },
-                  }),
+                  })
+                    .replace(/</g, "\\u003c")
+                    .replace(/>/g, "\\u003e")
+                    .replace(/&/g, "\\u0026"),
                 }}
               />
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
