@@ -1,54 +1,96 @@
-import { Link } from "react-router-dom";
-import { Facebook, Instagram, Mail, Phone, MapPin } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
+import { Facebook, Instagram, Mail, Phone, MapPin, MessageCircle } from "lucide-react";
+import { AIAssistant } from "./AIAssistant";
+
 export function Footer() {
-  return <footer className="bg-card border-t border-border">
+  const location = useLocation();
+  const isAdminPage = location.pathname === "/admin";
+
+  // Minimal footer for admin page
+  if (isAdminPage) {
+    return (
+      <footer className="bg-card border-t border-border py-6">
+        <div className="container mx-auto px-4 text-center">
+          <p className="text-muted-foreground text-sm">
+            © {new Date().getFullYear()} Chitraboli চিত্রাবলী. Admin Panel.
+          </p>
+        </div>
+      </footer>
+    );
+  }
+
+  return (
+    <footer className="bg-card border-t border-border relative">
       <div className="container mx-auto px-4 py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           {/* Brand */}
           <div className="col-span-1 md:col-span-2">
             <Link to="/" className="flex flex-col items-start mb-4">
-              <span className="font-display text-3xl font-semibold text-gold tracking-wide">
-                Chitraboli
-              </span>
+              <span className="font-display text-3xl font-semibold text-gold tracking-wide">Chitraboli</span>
               <span className="font-display text-lg text-gold-light opacity-80">চিত্রাবলী ✨</span>
             </Link>
             <p className="text-muted-foreground font-body text-sm leading-relaxed max-w-md">
-              Handmade with Love, Crafted with Passion. Every piece of Chitraboli jewellery is inspired by art, 
+              Handmade with Love, Crafted with Passion. Every piece of Chitraboli jewellery is inspired by art,
               tradition, and passion. We create unique pieces to make you shine.
             </p>
             <div className="flex gap-4 mt-6">
-              <a href="https://www.facebook.com/chitraboli1" target="_blank" rel="noopener noreferrer" className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors">
+              <a
+                href="https://www.facebook.com/chitraboli1"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Follow us on Facebook"
+                className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+              >
                 <Facebook className="h-5 w-5" />
               </a>
-              <a href="#" className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors">
+              <a
+                href="https://instagram.com/chitraboli.shop/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Follow us on Instagram"
+                className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+              >
                 <Instagram className="h-5 w-5" />
+              </a>
+              <a
+                href="https://wa.me/8801308697630"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Contact us on WhatsApp"
+                className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-green-500 hover:bg-green-500/10 transition-colors"
+              >
+                <MessageCircle className="h-5 w-5" />
               </a>
             </div>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-display text-lg font-semibold text-foreground mb-4">
-              Quick Links
-            </h4>
+            <h2 className="font-display text-lg font-semibold text-foreground mb-4">Quick Links</h2>
             <ul className="space-y-3">
-              {["Shop", "Collections", "About Us", "Contact"].map(item => <li key={item}>
-                  <Link to={`/${item.toLowerCase().replace(" ", "-")}`} className="text-muted-foreground text-sm hover:text-primary transition-colors">
-                    {item}
+              {[
+                { label: "Shop", path: "/shop" },
+                { label: "Collections", path: "/collections" },
+                { label: "About Us", path: "/about" },
+                { label: "Contact", path: "/contact" },
+                { label: "Track Order", path: "/track-order" },
+              ].map((item) => (
+                <li key={item.label}>
+                  <Link to={item.path} className="text-muted-foreground text-sm hover:text-primary transition-colors">
+                    {item.label}
                   </Link>
-                </li>)}
+                </li>
+              ))}
             </ul>
           </div>
 
           {/* Contact */}
           <div>
-            <h4 className="font-display text-lg font-semibold text-foreground mb-4">
-              Contact Us
-            </h4>
+            <h2 className="font-display text-lg font-semibold text-foreground mb-4">Contact Us</h2>
             <ul className="space-y-3">
               <li className="flex items-center gap-3 text-muted-foreground text-sm">
                 <Phone className="h-4 w-4 text-primary" />
-                <span>+880 1308697630</span>
+                <span>+880 1308-697630</span>
               </li>
               <li className="flex items-center gap-3 text-muted-foreground text-sm">
                 <Mail className="h-4 w-4 text-primary" />
@@ -62,11 +104,15 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-border mt-12 pt-8 text-center">
+        <div className="border-t border-border mt-12 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-muted-foreground text-sm">
-            © {new Date().getFullYear()} Chitraboli চিত্রাবলী. All rights reserved.
+            © {new Date().getFullYear()} Chitraboli - চিত্রাবলী. All rights reserved.
           </p>
+
+          {/* AI Assistant embedded in footer */}
+          <AIAssistant />
         </div>
       </div>
-    </footer>;
+    </footer>
+  );
 }

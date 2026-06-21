@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Star, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { ReviewForm } from "./ReviewForm";
 
 interface Review {
   id: string;
@@ -65,8 +66,13 @@ export const ReviewsSection = () => {
           </p>
         </div>
 
+        {/* Review Form */}
+        <div className="max-w-xl mx-auto mb-12">
+          <ReviewForm onReviewSubmitted={loadReviews} />
+        </div>
+
         {reviews.length === 0 ? (
-          <p className="text-center text-muted-foreground">Loading reviews...</p>
+          <p className="text-center text-muted-foreground">No reviews yet. Be the first to share your experience!</p>
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

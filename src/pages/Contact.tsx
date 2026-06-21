@@ -2,30 +2,112 @@ import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Facebook, Instagram, Mail, Phone, MapPin, Send } from "lucide-react";
+import { Facebook, Instagram, Mail, Phone, MapPin, Send, Loader2, MessageCircle } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { SEO } from "@/components/SEO";
+import { useRateLimit } from "@/hooks/useRateLimit";
+
 const Contact = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    phone: "",
     subject: "",
     message: ""
   });
-  const handleSubmit = (e: React.FormEvent) => {
+  const [submitting, setSubmitting] = useState(false);
+
+  // Rate limit: max 3 submissions per 5 minutes
+  const { executeWithLimit, remainingAttempts, isAllowed } = useRateLimit({
+    maxAttempts: 3,
+    windowMs: 5 * 60 * 1000,
+    onRateLimitExceeded: () => {
+      toast({
+        title: "Too many attempts",
+        description: "Please wait a few minutes before sending another message.",
+        variant: "destructive"
+      });
+    }
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Message Sent!",
-      description: "Thank you for contacting us. We'll get back to you soon."
+    setSubmitting(true);
+
+    // Get honeypot value (should be empty for real users)
+    const honeypotElement = document.querySelector('input[name="website"]') as HTMLInputElement;
+    const honeypot = honeypotElement?.value || '';
+
+    const result = await executeWithLimit(async () => {
+      // Use edge function for server-side rate limiting and validation
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/submit-contact-message`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone || null,
+            subject: formData.subject,
+            message: formData.message,
+            honeypot
+          })
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (data.code === 'RATE_LIMITED') {
+          toast({
+            title: "Too many attempts",
+            description: "Please wait a few minutes before sending another message.",
+            variant: "destructive"
+          });
+          return null;
+        }
+        throw new Error(data.error || 'Failed to send message');
+      }
+
+      toast({
+        title: "Message Sent!",
+        description: "Thank you for contacting us. We'll get back to you soon."
+      });
+      
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        subject: "",
+        message: ""
+      });
+
+      return true;
     });
-    setFormData({
-      name: "",
-      email: "",
-      subject: "",
-      message: ""
-    });
+
+    if (result === null) {
+      // Rate limited - already handled
+    } else if (!result) {
+      toast({
+        title: "Error",
+        description: "Failed to send message. Please try again.",
+        variant: "destructive"
+      });
+    }
+
+    setSubmitting(false);
   };
-  return <Layout>
+
+  return (
+    <Layout>
+      <SEO 
+        title="Contact Us" 
+        description="Get in touch with Chitraboli. Have questions about our handmade jewellery or want to discuss a custom piece? We'd love to hear from you."
+      />
       {/* Header */}
       <section className="py-16 bg-card">
         <div className="container mx-auto px-4 text-center">
@@ -96,6 +178,9 @@ const Contact = () => {
                   <a href="#" className="h-12 w-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors">
                     <Instagram className="h-5 w-5" />
                   </a>
+                  <a href="https://wa.me/8801308697630" target="_blank" rel="noopener noreferrer" className="h-12 w-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-green-500 hover:bg-green-500/10 transition-colors">
+                    <MessageCircle className="h-5 w-5" />
+                  </a>
                 </div>
               </div>
             </div>
@@ -106,53 +191,103 @@ const Contact = () => {
                 Send a Message
               </h2>
               <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Honeypot field - hidden from users, bots will fill it */}
+                <input 
+                  type="text" 
+                  name="website" 
+                  className="hidden" 
+                  tabIndex={-1} 
+                  autoComplete="off" 
+                />
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">
                       Your Name
                     </label>
-                    <Input value={formData.name} onChange={e => setFormData({
-                    ...formData,
-                    name: e.target.value
-                  })} placeholder="Enter your name" required className="bg-background border-border/50 focus:border-primary" />
+                    <Input 
+                      value={formData.name} 
+                      onChange={e => setFormData({...formData, name: e.target.value})} 
+                      placeholder="Enter your name" 
+                      required 
+                      className="bg-background border-border/50 focus:border-primary" 
+                    />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">
                       Email Address
                     </label>
-                    <Input type="email" value={formData.email} onChange={e => setFormData({
-                    ...formData,
-                    email: e.target.value
-                  })} placeholder="Enter your email" required className="bg-background border-border/50 focus:border-primary" />
+                    <Input 
+                      type="email" 
+                      value={formData.email} 
+                      onChange={e => setFormData({...formData, email: e.target.value})} 
+                      placeholder="Enter your email" 
+                      required 
+                      className="bg-background border-border/50 focus:border-primary" 
+                    />
                   </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    Phone Number (Optional)
+                  </label>
+                  <Input 
+                    type="tel"
+                    value={formData.phone} 
+                    onChange={e => setFormData({...formData, phone: e.target.value})} 
+                    placeholder="Enter your phone number" 
+                    className="bg-background border-border/50 focus:border-primary" 
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
                     Subject
                   </label>
-                  <Input value={formData.subject} onChange={e => setFormData({
-                  ...formData,
-                  subject: e.target.value
-                })} placeholder="What is this about?" required className="bg-background border-border/50 focus:border-primary" />
+                  <Input 
+                    value={formData.subject} 
+                    onChange={e => setFormData({...formData, subject: e.target.value})} 
+                    placeholder="What is this about?" 
+                    required 
+                    className="bg-background border-border/50 focus:border-primary" 
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
                     Message
                   </label>
-                  <Textarea value={formData.message} onChange={e => setFormData({
-                  ...formData,
-                  message: e.target.value
-                })} placeholder="Tell us more..." rows={5} required className="bg-background border-border/50 focus:border-primary resize-none" />
+                  <Textarea 
+                    value={formData.message} 
+                    onChange={e => setFormData({...formData, message: e.target.value})} 
+                    placeholder="Tell us more..." 
+                    rows={5} 
+                    required 
+                    className="bg-background border-border/50 focus:border-primary resize-none" 
+                  />
                 </div>
-                <Button variant="gold" size="lg" className="w-full">
-                  <Send className="mr-2 h-4 w-4" />
-                  Send Message
+                <Button 
+                  variant="gold" 
+                  size="lg" 
+                  className="w-full" 
+                  disabled={submitting}
+                >
+                  {submitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="mr-2 h-4 w-4" />
+                      Send Message
+                    </>
+                  )}
                 </Button>
               </form>
             </div>
           </div>
         </div>
       </section>
-    </Layout>;
+    </Layout>
+  );
 };
+
 export default Contact;

@@ -1,70 +1,143 @@
+import React, { lazy, Suspense } from "react";
+import { Link } from "react-router-dom";
+import { ShoppingCart, View, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
 import { useCart } from "@/contexts/CartContext";
+import { toast } from "@/hooks/use-toast";
+
+// Lazy load heavy AR/3D components to improve initial load performance
+const Product3DViewer = lazy(() => import("./Product3DViewer").then(m => ({ default: m.Product3DViewer })));
+const ARTryOn = lazy(() => import("./ARTryOn").then(m => ({ default: m.ARTryOn })));
 
 interface ProductCardProps {
-  id: number;
+  id: string | number;
   name: string;
   price: number;
   image: string;
   category?: string;
 }
 
-export function ProductCard({ id, name, price, image, category }: ProductCardProps) {
-  const { addItem } = useCart();
+export const ProductCard = React.forwardRef<HTMLDivElement, ProductCardProps>(
+  ({ id, name, price, image, category }, ref) => {
+    const { addItem } = useCart();
+    const [show3DViewer, setShow3DViewer] = React.useState(false);
+    const [showARTryOn, setShowARTryOn] = React.useState(false);
 
-  const handleAddToCart = () => {
-    addItem({
-      product_id: String(id),
-      product_name: name,
-      product_price: price,
-      product_image: image,
-    });
-    toast({
-      title: "Added to Cart",
-      description: `${name} has been added to your cart.`,
-    });
-  };
+    const handleAddToCart = (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      addItem({
+        product_id: String(id),
+        product_name: name,
+        product_price: price,
+        product_image: image,
+      });
+      toast({
+        title: "Added to Cart",
+        description: `${name} has been added to your cart.`,
+      });
+    };
 
-  return (
-    <div className="group relative bg-card rounded-lg overflow-hidden border border-border/50 hover:border-primary/30 transition-all duration-500 hover:shadow-gold">
-      {/* Image */}
-      <div className="relative aspect-square overflow-hidden bg-muted">
-        <img
-          src={image}
-          alt={name}
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-        
-        {/* Quick Add Button */}
-        <div className="absolute bottom-4 left-4 right-4 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500">
-          <Button
-            variant="gold"
-            className="w-full"
-            onClick={handleAddToCart}
+    const handleActionClick = (e: React.MouseEvent, action: () => void) => {
+      e.preventDefault();
+      e.stopPropagation();
+      action();
+    };
+
+    return (
+      <>
+        <Link to={`/product/${id}`}>
+          <div
+            ref={ref}
+            className="group relative bg-card rounded-lg overflow-hidden border border-border/50 hover:border-primary/30 transition-all duration-500 hover:shadow-gold cursor-pointer"
           >
-            <ShoppingCart className="h-4 w-4 mr-2" />
-            Add to Cart
-          </Button>
-        </div>
-      </div>
+            {/* Image */}
+            <div className="relative aspect-square overflow-hidden bg-muted">
+              <img
+                src={image}
+                alt={name}
+                width={400}
+                height={400}
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                loading="lazy"
+                decoding="async"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-      {/* Info */}
-      <div className="p-4">
-        {category && (
-          <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
-            {category}
-          </p>
+              {/* Quick Action Buttons - Top Right */}
+              <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 transition-all duration-500">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={(e) => handleActionClick(e, () => setShow3DViewer(true))}
+                  className="h-9 w-9 bg-background/90 backdrop-blur border-primary/30 hover:bg-primary hover:text-primary-foreground"
+                  title="360° View"
+                >
+                  <View className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={(e) => handleActionClick(e, () => setShowARTryOn(true))}
+                  className="h-9 w-9 bg-background/90 backdrop-blur border-primary/30 hover:bg-primary hover:text-primary-foreground"
+                  title="Virtual Try-On"
+                >
+                  <Sparkles className="h-4 w-4" />
+                </Button>
+              </div>
+
+              {/* Quick Add Button */}
+              <div className="absolute bottom-4 left-4 right-4 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500">
+                <Button variant="gold" className="w-full" onClick={handleAddToCart}>
+                  <ShoppingCart className="h-4 w-4 mr-2" />
+                  Add to Cart
+                </Button>
+              </div>
+            </div>
+
+            {/* Info */}
+            <div className="p-4">
+              {category && (
+                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
+                  {category}
+                </p>
+              )}
+              <h3 className="font-display text-lg font-medium text-foreground mb-2 group-hover:text-primary transition-colors">
+                {name}
+              </h3>
+              <p className="text-primary font-semibold">৳ {price.toLocaleString()}</p>
+            </div>
+          </div>
+        </Link>
+
+        {/* 3D Viewer Modal - Lazy loaded */}
+        {show3DViewer && (
+          <Suspense fallback={null}>
+            <Product3DViewer
+              isOpen={show3DViewer}
+              onClose={() => setShow3DViewer(false)}
+              productName={name}
+              productImage={image}
+              category={category}
+            />
+          </Suspense>
         )}
-        <h3 className="font-display text-lg font-medium text-foreground mb-2 group-hover:text-primary transition-colors">
-          {name}
-        </h3>
-        <p className="text-primary font-semibold">
-          ৳ {price.toLocaleString()}
-        </p>
-      </div>
-    </div>
-  );
-}
+
+        {/* AR Try-On Modal - Lazy loaded */}
+        {showARTryOn && (
+          <Suspense fallback={null}>
+            <ARTryOn
+              isOpen={showARTryOn}
+              onClose={() => setShowARTryOn(false)}
+              productName={name}
+              productImage={image}
+              category={category}
+            />
+          </Suspense>
+        )}
+      </>
+    );
+  }
+);
+
+ProductCard.displayName = "ProductCard";
