@@ -55,7 +55,7 @@ export const ProductCard = React.forwardRef<HTMLDivElement, ProductCardProps>(
             <div className="relative aspect-square overflow-hidden bg-muted">
               <img
                 src={image}
-                alt={name}
+                alt={`Handcrafted ${name} jewellery`}
                 width={400}
                 height={400}
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
