@@ -47,7 +47,7 @@ export function NewArrivalsSection() {
 
         {/* Products Grid */}
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 gap-6">
             {[...Array(4)].map((_, i) => (
               <div key={i} className="space-y-4">
                 <Skeleton className="aspect-square w-full rounded-xl" />
@@ -57,7 +57,7 @@ export function NewArrivalsSection() {
             ))}
           </div>
         ) : newArrivals.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 gap-6">
             {newArrivals.map((product, index) => (
               <div
                 key={product.id}
