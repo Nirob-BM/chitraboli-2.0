@@ -128,7 +128,7 @@ const Index = () => {
           </div>
 
           <div className="grid grid-cols-2 gap-6">
-            {featuredProducts.map(product => <ProductCard key={product.id} {...product} />)}</div>
+            {featuredProducts.map(product => <ProductCard key={product.id} {...product} />)}
           </div>
 
           <div className="text-center mt-12">
