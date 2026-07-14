@@ -54,7 +54,7 @@ export const SpecialOffersSection = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 gap-6">
           {specialOffers.map((product, index) => (
             <div
               key={product.id}
