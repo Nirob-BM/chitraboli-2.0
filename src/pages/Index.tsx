@@ -18,11 +18,14 @@ const Index = () => {
       <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden gradient-hero">
         {/* Background Image */}
         <div className="absolute inset-0">
-          <img 
-            src={heroImage} 
-            alt="Handmade jewelry" 
+          <img
+            src={heroImage}
+            alt="Handmade jewelry"
+            width={1920}
+            height={1080}
             className="w-full h-full object-cover opacity-40"
             fetchPriority="high"
+            loading="eager"
             decoding="async"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background" />
@@ -35,10 +38,9 @@ const Index = () => {
       }} />
 
         {/* Content */}
-        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-          <h1 className="font-display text-5xl md:text-7xl lg:text-8xl font-light text-foreground mb-4 animate-fade-up">
-            Handmade with{" "}
-            <span className="text-gold font-medium">Love</span>
+        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto py-8 md:py-12">
+          <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-light text-foreground mb-4 leading-tight text-balance md:whitespace-nowrap animate-fade-up">
+            Handmade with <span className="text-gold font-medium">Love</span>
           </h1>
           <p className="font-display text-xl md:text-2xl text-muted-foreground mb-8 animate-fade-up" style={{
           animationDelay: "0.2s"
@@ -125,8 +127,12 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredProducts.map(product => <ProductCard key={product.id} {...product} />)}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            {featuredProducts.slice(0, 4).map((product, i) => (
+              <div key={product.id} className={i === 3 ? "md:max-lg:hidden" : ""}>
+                <ProductCard {...product} />
+              </div>
+            ))}
           </div>
 
           <div className="text-center mt-12">
@@ -152,11 +158,11 @@ const Index = () => {
               Join Our Community
             </h2>
             <p className="text-muted-foreground mb-8">
-              Follow us on social media for the latest collections, special offers, and behind-the-scenes content.
+              Chat with us on WhatsApp for the latest collections, special offers, and quick support.
             </p>
-            <a href="https://www.facebook.com/chitraboli1" target="_blank" rel="noopener noreferrer">
+            <a href="https://wa.me/8801636665467" target="_blank" rel="noopener noreferrer">
               <Button variant="gold" size="lg">
-                Follow on Facebook
+                Chat on WhatsApp
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </a>

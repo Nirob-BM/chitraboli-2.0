@@ -51,7 +51,7 @@ const SAMPLE_ROUTES = [
 
 export const useRiderLocationSimulation = () => {
   const [simulations, setSimulations] = useState<Map<string, SimulationState>>(new Map());
-  const intervalRefs = useRef<Map<string, NodeJS.Timeout>>(new Map());
+  const intervalRefs = useRef<Map<string, ReturnType<typeof setInterval>>>(new Map());
 
   const startSimulation = useCallback(async (riderId: string, intervalMs: number = 3000) => {
     // Stop any existing simulation for this rider

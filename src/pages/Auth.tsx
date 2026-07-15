@@ -111,12 +111,12 @@ const Auth = () => {
       <div className="min-h-screen flex items-center justify-center py-12 px-4">
         <Card className="w-full max-w-md bg-card border-border">
           <CardHeader className="text-center">
-            <CardTitle className="font-display text-2xl">
+            <h1 className="font-display text-2xl font-semibold">
               {isLogin ? "Welcome Back" : "Create Account"}
-            </CardTitle>
+            </h1>
             <CardDescription>
-              {isLogin 
-                ? "Sign in to your account" 
+              {isLogin
+                ? "Sign in to your account"
                 : "Create an account to get started"}
             </CardDescription>
           </CardHeader>

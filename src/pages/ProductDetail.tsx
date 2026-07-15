@@ -154,6 +154,32 @@ const ProductDetail = () => {
             </div>
           ) : (
             <>
+              <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                  __html: JSON.stringify({
+                    "@context": "https://schema.org",
+                    "@type": "Product",
+                    name: product.name,
+                    image: images,
+                    description: product.description || undefined,
+                    category: product.category,
+                    brand: { "@type": "Brand", name: "Chitraboli" },
+                    offers: {
+                      "@type": "Offer",
+                      price: product.price,
+                      priceCurrency: "BDT",
+                      availability: product.in_stock
+                        ? "https://schema.org/InStock"
+                        : "https://schema.org/OutOfStock",
+                      url: `https://chitraboli.lovable.app/product/${product.id}`,
+                    },
+                  })
+                    .replace(/</g, "\\u003c")
+                    .replace(/>/g, "\\u003e")
+                    .replace(/&/g, "\\u0026"),
+                }}
+              />
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
                 {/* Image Gallery */}
                 <div className="space-y-4">
@@ -282,14 +308,16 @@ const ProductDetail = () => {
                         size="icon"
                         onClick={() => setQuantity(Math.max(1, quantity - 1))}
                         disabled={quantity <= 1}
+                        aria-label="Decrease quantity"
                       >
                         <Minus className="h-4 w-4" />
                       </Button>
-                      <span className="w-12 text-center font-medium text-lg">{quantity}</span>
+                      <span className="w-12 text-center font-medium text-lg" aria-live="polite">{quantity}</span>
                       <Button
                         variant="outline"
                         size="icon"
                         onClick={() => setQuantity(quantity + 1)}
+                        aria-label="Increase quantity"
                       >
                         <Plus className="h-4 w-4" />
                       </Button>

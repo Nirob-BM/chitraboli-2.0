@@ -53,7 +53,7 @@ export const NotificationSettings = () => {
     try {
       const { error } = await supabase
         .from('notification_settings')
-        .update({ [field]: value })
+        .update({ [field]: value } as any)
         .eq('id', id);
 
       if (error) throw error;

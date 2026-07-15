@@ -55,7 +55,7 @@ export const ProductCard = React.forwardRef<HTMLDivElement, ProductCardProps>(
             <div className="relative aspect-square overflow-hidden bg-muted">
               <img
                 src={image}
-                alt={name}
+                alt={`Handcrafted ${name} jewellery`}
                 width={400}
                 height={400}
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
@@ -72,8 +72,9 @@ export const ProductCard = React.forwardRef<HTMLDivElement, ProductCardProps>(
                   onClick={(e) => handleActionClick(e, () => setShow3DViewer(true))}
                   className="h-9 w-9 bg-background/90 backdrop-blur border-primary/30 hover:bg-primary hover:text-primary-foreground"
                   title="360° View"
+                  aria-label="360 degree view"
                 >
-                  <View className="h-4 w-4" />
+                  <View className="h-4 w-4" aria-hidden="true" />
                 </Button>
                 <Button
                   variant="outline"
@@ -81,8 +82,9 @@ export const ProductCard = React.forwardRef<HTMLDivElement, ProductCardProps>(
                   onClick={(e) => handleActionClick(e, () => setShowARTryOn(true))}
                   className="h-9 w-9 bg-background/90 backdrop-blur border-primary/30 hover:bg-primary hover:text-primary-foreground"
                   title="Virtual Try-On"
+                  aria-label="Virtual try-on"
                 >
-                  <Sparkles className="h-4 w-4" />
+                  <Sparkles className="h-4 w-4" aria-hidden="true" />
                 </Button>
               </div>
 
@@ -96,16 +98,16 @@ export const ProductCard = React.forwardRef<HTMLDivElement, ProductCardProps>(
             </div>
 
             {/* Info */}
-            <div className="p-4">
+            <div className="p-3 sm:p-4">
               {category && (
-                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
+                <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider mb-1 truncate">
                   {category}
                 </p>
               )}
-              <h3 className="font-display text-lg font-medium text-foreground mb-2 group-hover:text-primary transition-colors">
+              <h3 className="font-display text-sm sm:text-base md:text-lg font-medium text-foreground mb-1 sm:mb-2 group-hover:text-primary transition-colors line-clamp-2 min-h-[2.5em] leading-snug">
                 {name}
               </h3>
-              <p className="text-primary font-semibold">৳ {price.toLocaleString()}</p>
+              <p className="text-primary font-semibold text-sm sm:text-base">৳ {price.toLocaleString()}</p>
             </div>
           </div>
         </Link>

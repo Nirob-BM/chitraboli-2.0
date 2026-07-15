@@ -1,38 +1,48 @@
 import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 interface SEOProps {
   title?: string;
   description?: string;
   keywords?: string;
   image?: string;
+  /** Absolute or path-relative URL for this page. Defaults to the current route. */
   url?: string;
   type?: "website" | "product" | "article";
 }
 
+const SITE_ORIGIN = "https://chitraboli.lovable.app";
 const DEFAULT_TITLE = "Chitraboli চিত্রাবলী - Handmade Jewellery with Love";
-const DEFAULT_DESCRIPTION = "Chitraboli creates handmade jewellery inspired by art, tradition and passion. Discover unique rings, necklaces, earrings and bangles crafted with love in Bangladesh.";
-const DEFAULT_IMAGE = "https://lovable.dev/opengraph-image-p98pqg.png";
-const DEFAULT_URL = "https://chitraboli.com";
+const DEFAULT_DESCRIPTION =
+  "Handmade jewellery from Bangladesh — unique rings, necklaces, earrings & bangles crafted with love by Chitraboli artisans.";
+const DEFAULT_IMAGE =
+  "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/96110fad-0606-4610-a360-41ee1d1eb0aa";
 
 export const SEO = ({
   title,
   description = DEFAULT_DESCRIPTION,
   keywords,
   image = DEFAULT_IMAGE,
-  url = DEFAULT_URL,
+  url,
   type = "website",
 }: SEOProps) => {
+  const { pathname, search } = useLocation();
   const fullTitle = title ? `${title} | Chitraboli` : DEFAULT_TITLE;
 
+  // Resolve canonical/og:url. If caller passed an absolute URL, use it.
+  // Otherwise self-reference the current route on the production origin.
+  const resolvedUrl = url
+    ? /^https?:\/\//i.test(url)
+      ? url
+      : `${SITE_ORIGIN}${url.startsWith("/") ? url : `/${url}`}`
+    : `${SITE_ORIGIN}${pathname}${search || ""}`;
+
   useEffect(() => {
-    // Update document title
     document.title = fullTitle;
 
-    // Update meta tags
     const updateMetaTag = (name: string, content: string, isProperty = false) => {
       const selector = isProperty ? `meta[property="${name}"]` : `meta[name="${name}"]`;
       let element = document.querySelector(selector) as HTMLMetaElement | null;
-      
       if (element) {
         element.content = content;
       } else {
@@ -47,29 +57,40 @@ export const SEO = ({
       }
     };
 
-    // Standard meta tags
+    const updateCanonical = (href: string) => {
+      let link = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+      if (!link) {
+        link = document.createElement("link");
+        link.setAttribute("rel", "canonical");
+        document.head.appendChild(link);
+      }
+      link.setAttribute("href", href);
+    };
+
     updateMetaTag("description", description);
     if (keywords) {
       updateMetaTag("keywords", keywords);
     }
 
-    // Open Graph tags
+    // Canonical self-references this route
+    updateCanonical(resolvedUrl);
+
+    // Open Graph
     updateMetaTag("og:title", fullTitle, true);
     updateMetaTag("og:description", description, true);
     updateMetaTag("og:image", image, true);
-    updateMetaTag("og:url", url, true);
+    updateMetaTag("og:url", resolvedUrl, true);
     updateMetaTag("og:type", type, true);
 
-    // Twitter Card tags
+    // Twitter
     updateMetaTag("twitter:title", fullTitle);
     updateMetaTag("twitter:description", description);
     updateMetaTag("twitter:image", image);
 
-    // Cleanup - reset to defaults when component unmounts
     return () => {
       document.title = DEFAULT_TITLE;
     };
-  }, [fullTitle, description, keywords, image, url, type]);
+  }, [fullTitle, description, keywords, image, resolvedUrl, type]);
 
   return null;
 };

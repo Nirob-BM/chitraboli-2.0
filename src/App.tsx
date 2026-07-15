@@ -13,6 +13,7 @@ import { AdSense } from "@/components/AdSense";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { SkipToContent } from "@/components/SkipToContent";
 import { PageSkeleton } from "@/components/PageSkeleton";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 // Lazy load pages for better performance (code splitting)
 const Index = lazy(() => import("./pages/Index"));
@@ -26,6 +27,10 @@ const TrackOrder = lazy(() => import("./pages/TrackOrder"));
 const ProductDetail = lazy(() => import("./pages/ProductDetail"));
 const Profile = lazy(() => import("./pages/Profile"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const Trust = lazy(() => import("./pages/Trust"));
+const BlogIdentifyingHandcraftedJewelry = lazy(
+  () => import("./pages/BlogIdentifyingHandcraftedJewelry")
+);
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -57,8 +62,13 @@ const AppContent = () => {
             <Route path="/contact" element={<Contact />} />
             <Route path="/track-order" element={<TrackOrder />} />
             <Route path="/profile" element={<Profile />} />
-            <Route path="/admin" element={<Admin />} />
+            <Route path="/admin" element={<ProtectedRoute requireAdmin><Admin /></ProtectedRoute>} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/trust" element={<Trust />} />
+            <Route
+              path="/blog/identifying-handcrafted-jewelry"
+              element={<BlogIdentifyingHandcraftedJewelry />}
+            />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

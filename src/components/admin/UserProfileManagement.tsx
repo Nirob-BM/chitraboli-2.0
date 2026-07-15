@@ -229,12 +229,12 @@ export const UserProfileManagement = () => {
       if (error) throw error;
       
       // Log the action
-      await supabase.from('profile_audit_logs').insert({
-        user_id: userToSuspend.id,
-        action: 'account_suspended',
-        field_changed: 'account_status',
-        old_value: userToSuspend.account_status,
-        new_value: 'suspended'
+      await supabase.rpc('admin_log_profile_audit', {
+        _target_user_id: userToSuspend.id,
+        _action: 'account_suspended',
+        _field_changed: 'account_status',
+        _old_value: userToSuspend.account_status,
+        _new_value: 'suspended',
       });
       
       toast.success(`${userToSuspend.full_name || 'User'} has been suspended`);

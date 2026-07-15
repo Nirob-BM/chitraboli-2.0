@@ -84,7 +84,7 @@ const Collections = () => {
                     {collection.image_url ? (
                       <img
                         src={collection.image_url}
-                        alt={collection.name}
+                        alt={`Handcrafted ${collection.name} jewellery collection`}
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                       />
                     ) : (

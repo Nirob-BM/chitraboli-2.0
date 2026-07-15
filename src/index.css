@@ -1,5 +1,11 @@
 /* Fonts are loaded in index.html for non-blocking render */
 
+#lovable-badge {
+  display: none !important;
+}
+
+
+
 
 @tailwind base;
 @tailwind components;
