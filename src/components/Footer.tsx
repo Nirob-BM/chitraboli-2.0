@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Facebook, Instagram, Mail, Phone, MapPin, MessageCircle } from "lucide-react";
+import { Mail, Phone, MapPin, MessageCircle } from "lucide-react";
 import { AIAssistant } from "./AIAssistant";
 
 export function Footer() {
