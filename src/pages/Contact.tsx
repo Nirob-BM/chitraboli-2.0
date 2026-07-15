@@ -2,7 +2,7 @@ import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Facebook, Instagram, Mail, Phone, MapPin, Send, Loader2, MessageCircle } from "lucide-react";
+import { Mail, Phone, MapPin, Send, Loader2, MessageCircle } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { SEO } from "@/components/SEO";
@@ -172,13 +172,7 @@ const Contact = () => {
                   Follow Us
                 </h3>
                 <div className="flex gap-4">
-                  <a href="https://www.facebook.com/chitraboli1" target="_blank" rel="noopener noreferrer" className="h-12 w-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors">
-                    <Facebook className="h-5 w-5" />
-                  </a>
-                  <a href="#" className="h-12 w-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors">
-                    <Instagram className="h-5 w-5" />
-                  </a>
-                  <a href="https://wa.me/8801308697630" target="_blank" rel="noopener noreferrer" className="h-12 w-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-green-500 hover:bg-green-500/10 transition-colors">
+                  <a href="https://wa.me/8801636665467" target="_blank" rel="noopener noreferrer" className="h-12 w-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-green-500 hover:bg-green-500/10 transition-colors">
                     <MessageCircle className="h-5 w-5" />
                   </a>
                 </div>
