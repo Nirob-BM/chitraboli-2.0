@@ -127,8 +127,12 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-6">
-            {featuredProducts.map(product => <ProductCard key={product.id} {...product} />)}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            {featuredProducts.slice(0, 4).map((product, i) => (
+              <div key={product.id} className={i === 3 ? "md:max-lg:hidden" : ""}>
+                <ProductCard {...product} />
+              </div>
+            ))}
           </div>
 
           <div className="text-center mt-12">
