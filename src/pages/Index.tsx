@@ -158,11 +158,11 @@ const Index = () => {
               Join Our Community
             </h2>
             <p className="text-muted-foreground mb-8">
-              Follow us on social media for the latest collections, special offers, and behind-the-scenes content.
+              Chat with us on WhatsApp for the latest collections, special offers, and quick support.
             </p>
-            <a href="https://www.facebook.com/chitraboli1" target="_blank" rel="noopener noreferrer">
+            <a href="https://wa.me/8801636665467" target="_blank" rel="noopener noreferrer">
               <Button variant="gold" size="lg">
-                Follow on Facebook
+                Chat on WhatsApp
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </a>
