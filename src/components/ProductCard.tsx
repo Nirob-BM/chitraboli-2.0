@@ -98,16 +98,16 @@ export const ProductCard = React.forwardRef<HTMLDivElement, ProductCardProps>(
             </div>
 
             {/* Info */}
-            <div className="p-4">
+            <div className="p-3 sm:p-4">
               {category && (
-                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
+                <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider mb-1 truncate">
                   {category}
                 </p>
               )}
-              <h3 className="font-display text-lg font-medium text-foreground mb-2 group-hover:text-primary transition-colors">
+              <h3 className="font-display text-sm sm:text-base md:text-lg font-medium text-foreground mb-1 sm:mb-2 group-hover:text-primary transition-colors line-clamp-2 min-h-[2.5em] leading-snug">
                 {name}
               </h3>
-              <p className="text-primary font-semibold">৳ {price.toLocaleString()}</p>
+              <p className="text-primary font-semibold text-sm sm:text-base">৳ {price.toLocaleString()}</p>
             </div>
           </div>
         </Link>

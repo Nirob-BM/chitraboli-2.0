@@ -47,9 +47,9 @@ export function NewArrivalsSection() {
 
         {/* Products Grid */}
         {loading ? (
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="space-y-4">
+              <div key={i} className={`space-y-4 ${i === 3 ? "md:max-lg:hidden" : ""}`}>
                 <Skeleton className="aspect-square w-full rounded-xl" />
                 <Skeleton className="h-4 w-3/4" />
                 <Skeleton className="h-4 w-1/2" />
@@ -57,11 +57,11 @@ export function NewArrivalsSection() {
             ))}
           </div>
         ) : newArrivals.length > 0 ? (
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
             {newArrivals.map((product, index) => (
               <div
                 key={product.id}
-                className="animate-fade-up"
+                className={`animate-fade-up ${index === 3 ? "md:max-lg:hidden" : ""}`}
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <div className="relative group">
