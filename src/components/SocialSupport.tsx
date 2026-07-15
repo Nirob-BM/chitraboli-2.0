@@ -1,7 +1,7 @@
 import { MessageCircle, Instagram, Phone } from "lucide-react";
 import { cn } from "@/lib/utils";
-const WHATSAPP_NUMBER = "8801308697630";
-const INSTAGRAM_URL = "https://www.instagram.com/chitraboli.shop";
+const WHATSAPP_NUMBER = "8801636665467";
+const INSTAGRAM_URL = "https://www.instagram.com/";
 export const SocialSupport = () => {
   return <div className="fixed bottom-6 left-6 z-50 flex flex-col gap-3">
       {/* WhatsApp Button */}

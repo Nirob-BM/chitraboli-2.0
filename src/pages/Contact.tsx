@@ -59,7 +59,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <h3 className="font-display text-lg font-medium text-foreground">Phone</h3>
-                    <p className="text-muted-foreground">+880 13086 97630</p>
+                    <p className="text-muted-foreground">+880 16366-65467</p>
                   </div>
                 </div>
 
@@ -69,7 +69,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <h3 className="font-display text-lg font-medium text-foreground">Email</h3>
-                    <p className="text-muted-foreground">info.chitraboli@gmail.com</p>
+                    <p className="text-muted-foreground">contact.info@gmail.com</p>
                   </div>
                 </div>
 
@@ -90,7 +90,7 @@ const Contact = () => {
                   Follow Us
                 </h3>
                 <div className="flex gap-4">
-                  <a href="https://www.facebook.com/chitraboli1" target="_blank" rel="noopener noreferrer" className="h-12 w-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors">
+                  <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" className="h-12 w-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors">
                     <Facebook className="h-5 w-5" />
                   </a>
                   <a href="#" className="h-12 w-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors">

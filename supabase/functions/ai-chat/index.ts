@@ -41,7 +41,7 @@ serve(async (req) => {
 Be friendly, professional, and helpful. Keep responses concise but informative. 
 If asked about specific orders, ask for their order ID.
 Our jewelry is handmade with love and crafted with passion in Bangladesh.
-Contact: WhatsApp +880 1308697630, Instagram @chitraboli.shop`
+Contact: WhatsApp +8801636665467, Instagram `
           },
           ...messages,
         ],

@@ -161,7 +161,7 @@ const Index = () => {
             <p className="text-muted-foreground mb-8">
               Follow us on social media for the latest collections, special offers, and behind-the-scenes content.
             </p>
-            <a href="https://www.facebook.com/chitraboli1" target="_blank" rel="noopener noreferrer">
+            <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer">
               <Button variant="gold" size="lg">
                 Follow on Facebook
                 <ArrowRight className="ml-2 h-4 w-4" />
