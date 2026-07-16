@@ -23,6 +23,7 @@ const About = lazy(() => import("./pages/About"));
 const Contact = lazy(() => import("./pages/Contact"));
 const Admin = lazy(() => import("./pages/Admin"));
 const Auth = lazy(() => import("./pages/Auth"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const TrackOrder = lazy(() => import("./pages/TrackOrder"));
 const ProductDetail = lazy(() => import("./pages/ProductDetail"));
 const Profile = lazy(() => import("./pages/Profile"));
@@ -64,6 +65,7 @@ const AppContent = () => {
             <Route path="/profile" element={<Profile />} />
             <Route path="/admin" element={<ProtectedRoute requireAdmin><Admin /></ProtectedRoute>} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/trust" element={<Trust />} />
             <Route
               path="/blog/identifying-handcrafted-jewelry"
