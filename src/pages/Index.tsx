@@ -7,7 +7,12 @@ import { SEO } from "@/components/SEO";
 import { Link } from "react-router-dom";
 import { ArrowRight, Sparkles, Heart, Award } from "lucide-react";
 import { getFeaturedProducts } from "@/data/products";
-import heroImage from "@/assets/hero-jewelry.jpg";
+// Responsive, modern-format hero. vite-imagetools generates AVIF + WebP variants at build time.
+// Fallback jpg is used as the <img src> for maximum compatibility.
+import heroAvifSrcset from "@/assets/hero-jewelry.jpg?w=640;960;1280;1920&format=avif&as=srcset";
+import heroWebpSrcset from "@/assets/hero-jewelry.jpg?w=640;960;1280;1920&format=webp&as=srcset";
+import heroJpgSrcset from "@/assets/hero-jewelry.jpg?w=640;960;1280;1920&format=jpg&as=srcset";
+import heroFallback from "@/assets/hero-jewelry.jpg?w=1280&format=jpg";
 
 const Index = () => {
   const featuredProducts = getFeaturedProducts();
