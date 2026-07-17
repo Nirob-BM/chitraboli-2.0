@@ -126,7 +126,7 @@ export function Footer() {
           </p>
 
           {/* AI Assistant embedded in footer */}
-          <AIAssistant />
+          <DeferredAIAssistant />
         </div>
       </div>
     </footer>
