@@ -7,7 +7,12 @@ import { SEO } from "@/components/SEO";
 import { Link } from "react-router-dom";
 import { ArrowRight, Sparkles, Heart, Award } from "lucide-react";
 import { getFeaturedProducts } from "@/data/products";
-import heroImage from "@/assets/hero-jewelry.jpg";
+// Responsive, modern-format hero. vite-imagetools generates AVIF + WebP variants at build time.
+// Fallback jpg is used as the <img src> for maximum compatibility.
+import heroAvifSrcset from "@/assets/hero-jewelry.jpg?w=640;960;1280;1920&format=avif&as=srcset";
+import heroWebpSrcset from "@/assets/hero-jewelry.jpg?w=640;960;1280;1920&format=webp&as=srcset";
+import heroJpgSrcset from "@/assets/hero-jewelry.jpg?w=640;960;1280;1920&format=jpg&as=srcset";
+import heroFallback from "@/assets/hero-jewelry.jpg?w=1280&format=jpg";
 
 const Index = () => {
   const featuredProducts = getFeaturedProducts();
@@ -18,16 +23,30 @@ const Index = () => {
       <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden gradient-hero">
         {/* Background Image */}
         <div className="absolute inset-0">
-          <img
-            src={heroImage}
-            alt="Handmade jewelry"
-            width={1920}
-            height={1080}
-            className="w-full h-full object-cover opacity-40"
-            fetchPriority="high"
-            loading="eager"
-            decoding="async"
-          />
+          <picture>
+            <source
+              type="image/avif"
+              srcSet={heroAvifSrcset}
+              sizes="100vw"
+            />
+            <source
+              type="image/webp"
+              srcSet={heroWebpSrcset}
+              sizes="100vw"
+            />
+            <img
+              src={heroFallback}
+              srcSet={heroJpgSrcset}
+              sizes="100vw"
+              alt="Handmade jewelry"
+              width={1920}
+              height={1080}
+              className="w-full h-full object-cover opacity-40"
+              fetchPriority="high"
+              loading="eager"
+              decoding="async"
+            />
+          </picture>
           <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background" />
         </div>
 

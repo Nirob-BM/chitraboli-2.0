@@ -12,17 +12,30 @@ interface AdSenseProps {
 
 export function AdSense({ publisherId }: AdSenseProps) {
   useEffect(() => {
-    // Check if script is already loaded
-    const existingScript = document.querySelector(
+    if (!publisherId) return;
+    const existing = document.querySelector(
       `script[src*="pagead2.googlesyndication.com"]`
     );
-    
-    if (!existingScript && publisherId) {
+    if (existing) return;
+
+    // Defer the AdSense script until the browser is idle so it never blocks
+    // initial render, TBT, or LCP on the homepage.
+    const loadScript = () => {
       const script = document.createElement("script");
       script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${publisherId}`;
       script.async = true;
       script.crossOrigin = "anonymous";
       document.head.appendChild(script);
+    };
+
+    const w = window as unknown as {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+    };
+    if (typeof w.requestIdleCallback === "function") {
+      w.requestIdleCallback(loadScript, { timeout: 4000 });
+    } else {
+      const id = setTimeout(loadScript, 4000);
+      return () => clearTimeout(id);
     }
   }, [publisherId]);
 
