@@ -7,12 +7,7 @@ import { SEO } from "@/components/SEO";
 import { Link } from "react-router-dom";
 import { ArrowRight, Sparkles, Heart, Award } from "lucide-react";
 import { getFeaturedProducts } from "@/data/products";
-// Responsive, modern-format hero. vite-imagetools generates AVIF + WebP variants at build time.
-// Fallback jpg is used as the <img src> for maximum compatibility.
-import heroAvifSrcset from "@/assets/hero-jewelry.jpg?w=640;960;1280;1920&format=avif&as=srcset";
-import heroWebpSrcset from "@/assets/hero-jewelry.jpg?w=640;960;1280;1920&format=webp&as=srcset";
-import heroJpgSrcset from "@/assets/hero-jewelry.jpg?w=640;960;1280;1920&format=jpg&as=srcset";
-import heroFallback from "@/assets/hero-jewelry.jpg?w=1280&format=jpg";
+import heroProduct from "@/assets/hero-product.png.asset.json";
 
 const Index = () => {
   const featuredProducts = getFeaturedProducts();
@@ -20,77 +15,80 @@ const Index = () => {
     <Layout>
       <SEO />
       {/* Hero Section */}
-      <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden gradient-hero">
-        {/* Background Image */}
-        <div className="absolute inset-0">
-          <picture>
-            <source
-              type="image/avif"
-              srcSet={heroAvifSrcset}
-              sizes="100vw"
-            />
-            <source
-              type="image/webp"
-              srcSet={heroWebpSrcset}
-              sizes="100vw"
-            />
-            <img
-              src={heroFallback}
-              srcSet={heroJpgSrcset}
-              sizes="100vw"
-              alt="Handmade jewelry"
-              width={1920}
-              height={1080}
-              className="w-full h-full object-cover opacity-40"
-              fetchPriority="high"
-              loading="eager"
-              decoding="async"
-            />
-          </picture>
-          <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background" />
-        </div>
+      <section className="relative min-h-[90vh] flex items-center overflow-hidden gradient-hero">
+        {/* Ambient glows */}
+        <div className="absolute top-1/4 left-10 w-64 h-64 rounded-full bg-primary/20 blur-3xl animate-float pointer-events-none" />
+        <div
+          className="absolute bottom-1/4 right-1/4 w-72 h-72 rounded-full bg-gold/10 blur-3xl animate-float pointer-events-none"
+          style={{ animationDelay: "2s" }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background pointer-events-none" />
 
-        {/* Decorative Elements */}
-        <div className="absolute top-1/4 left-10 w-32 h-32 rounded-full bg-primary/10 blur-3xl animate-float" />
-        <div className="absolute bottom-1/4 right-10 w-40 h-40 rounded-full bg-secondary/20 blur-3xl animate-float" style={{
-        animationDelay: "2s"
-      }} />
+        {/* Content grid */}
+        <div className="container relative z-10 mx-auto px-4 py-12 md:py-16">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            {/* Left: copy */}
+            <div className="text-center lg:text-left order-2 lg:order-1">
+              <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-light text-foreground mb-4 leading-[1.05] text-balance animate-fade-up">
+                Handmade with <span className="text-gold font-medium italic">Love</span>
+              </h1>
+              <p
+                className="font-display text-xl md:text-2xl text-muted-foreground mb-6 animate-fade-up"
+                style={{ animationDelay: "0.2s" }}
+              >
+                Crafted with Passion
+              </p>
+              <p
+                className="font-body text-muted-foreground max-w-xl mx-auto lg:mx-0 mb-10 animate-fade-up"
+                style={{ animationDelay: "0.4s" }}
+              >
+                Every piece of Chitraboli jewellery is inspired by art, tradition, and passion.
+                Discover unique handcrafted pieces that make you shine.
+              </p>
+              <div
+                className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start animate-fade-up"
+                style={{ animationDelay: "0.6s" }}
+              >
+                <Button variant="hero-solid" size="xl" asChild>
+                  <Link to="/shop">
+                    Explore Jewellery
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                </Button>
+                <Button variant="hero" size="xl" asChild>
+                  <Link to="/collections">View Collections</Link>
+                </Button>
+              </div>
+            </div>
 
-        {/* Content */}
-        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto py-8 md:py-12">
-          <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-light text-foreground mb-4 leading-tight text-balance md:whitespace-nowrap animate-fade-up">
-            Handmade with <span className="text-gold font-medium">Love</span>
-          </h1>
-          <p className="font-display text-xl md:text-2xl text-muted-foreground mb-8 animate-fade-up" style={{
-          animationDelay: "0.2s"
-        }}>
-            Crafted with Passion
-          </p>
-          <p className="font-body text-muted-foreground max-w-xl mx-auto mb-12 animate-fade-up" style={{
-          animationDelay: "0.4s"
-        }}>
-            Every piece of Chitraboli jewellery is inspired by art, tradition, and passion. 
-            Discover unique handcrafted pieces that make you shine.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-up" style={{
-          animationDelay: "0.6s"
-        }}>
-            <Button variant="hero-solid" size="xl" asChild>
-              <Link to="/shop">
-                Explore Jewellery
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
-            <Button variant="hero" size="xl" asChild>
-              <Link to="/collections">
-                View Collections
-              </Link>
-            </Button>
+            {/* Right: product image */}
+            <div className="relative order-1 lg:order-2 flex justify-center lg:justify-end animate-fade-up">
+              <div className="relative w-full max-w-[320px] sm:max-w-[420px] md:max-w-[520px] lg:max-w-none aspect-square">
+                {/* Soft radial halo behind product */}
+                <div
+                  className="absolute inset-[10%] rounded-full blur-3xl opacity-70"
+                  style={{
+                    background:
+                      "radial-gradient(circle at center, hsl(var(--gold) / 0.35), hsl(var(--primary) / 0.15) 45%, transparent 70%)",
+                  }}
+                />
+                <img
+                  src={heroProduct.url}
+                  alt="Handcrafted Chitraboli pendant necklace with floral motif and matching earrings"
+                  width={880}
+                  height={1180}
+                  fetchPriority="high"
+                  loading="eager"
+                  decoding="async"
+                  className="relative z-10 w-full h-full object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.55)]"
+                />
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 animate-bounce hidden sm:block">
           <div className="w-6 h-10 border-2 border-muted-foreground/30 rounded-full flex justify-center pt-2">
             <div className="w-1 h-2 bg-primary rounded-full animate-shimmer" />
           </div>
