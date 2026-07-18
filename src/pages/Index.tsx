@@ -65,7 +65,13 @@ const Index = () => {
             <div className="relative order-1 lg:order-2 flex justify-center lg:justify-end animate-fade-up">
               <div className="relative w-full max-w-[320px] sm:max-w-[420px] md:max-w-[520px] lg:max-w-none aspect-square">
                 {/* Soft radial halo behind product */}
-                <div className="absolute inset-0 rounded-full bg-gradient-radial from-gold/25 via-primary/10 to-transparent blur-2xl" />
+                <div
+                  className="absolute inset-[10%] rounded-full blur-3xl opacity-70"
+                  style={{
+                    background:
+                      "radial-gradient(circle at center, hsl(var(--gold) / 0.35), hsl(var(--primary) / 0.15) 45%, transparent 70%)",
+                  }}
+                />
                 <img
                   src={heroProduct.url}
                   alt="Handcrafted Chitraboli pendant necklace with floral motif and matching earrings"
