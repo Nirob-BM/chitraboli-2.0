@@ -12,9 +12,9 @@ interface SEOProps {
 }
 
 const SITE_ORIGIN = "https://chitraboli.lovable.app";
-const DEFAULT_TITLE = "Chitraboli চিত্রাবলী - Handmade Jewellery with Love";
+const DEFAULT_TITLE = "Chitraboli — Handmade with Love | Handcrafted Jewellery Bangladesh";
 const DEFAULT_DESCRIPTION =
-  "Handmade jewellery from Bangladesh — unique rings, necklaces, earrings & bangles crafted with love by Chitraboli artisans.";
+  "Discover Chitraboli — handcrafted jewellery made with love in Bangladesh. Unique artisan rings, necklaces, earrings & bangles for every special moment.";
 const DEFAULT_IMAGE =
   "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/96110fad-0606-4610-a360-41ee1d1eb0aa";
 

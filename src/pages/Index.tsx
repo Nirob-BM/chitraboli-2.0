@@ -13,7 +13,10 @@ const Index = () => {
   const featuredProducts = getFeaturedProducts();
   return (
     <Layout>
-      <SEO />
+      <SEO
+        title="Handmade with Love"
+        description="Discover Chitraboli — handcrafted jewellery made with love in Bangladesh. Unique artisan rings, necklaces, earrings & bangles for every special moment."
+      />
       {/* Hero Section */}
       <section className="relative min-h-[90vh] flex items-center overflow-hidden gradient-hero">
         {/* Ambient glows */}
