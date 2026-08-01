@@ -18,35 +18,39 @@ const Index = () => {
         description="Discover Chitraboli — handcrafted jewellery made with love in Bangladesh. Unique artisan rings, necklaces, earrings & bangles for every special moment."
       />
       {/* Hero Section */}
-      <section className="relative min-h-[90vh] flex items-center overflow-hidden gradient-hero">
-        {/* Ambient glows */}
-        <div className="absolute top-1/4 left-10 w-64 h-64 rounded-full bg-primary/20 blur-3xl animate-float pointer-events-none" />
+      <section className="relative min-h-[88vh] lg:min-h-[92vh] flex items-center overflow-hidden gradient-hero">
+        {/* Artistic bokeh / textured lighting */}
+        <div className="absolute -top-10 left-1/4 w-72 h-72 rounded-full bg-primary/25 blur-[100px] animate-float pointer-events-none" />
         <div
-          className="absolute bottom-1/4 right-1/4 w-72 h-72 rounded-full bg-gold/10 blur-3xl animate-float pointer-events-none"
-          style={{ animationDelay: "2s" }}
+          className="absolute top-1/3 right-1/3 w-56 h-56 rounded-full bg-gold/15 blur-[90px] animate-float pointer-events-none"
+          style={{ animationDelay: "1.5s" }}
+        />
+        <div
+          className="absolute bottom-0 right-10 w-80 h-80 rounded-full bg-rose-gold/10 blur-[110px] animate-float pointer-events-none"
+          style={{ animationDelay: "3s" }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background pointer-events-none" />
 
         {/* Content grid */}
-        <div className="container relative z-10 mx-auto px-4 py-12 md:py-16">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+        <div className="container relative z-10 mx-auto px-4 py-14 md:py-20">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
             {/* Left: copy */}
             <div className="text-center lg:text-left order-2 lg:order-1">
-              <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-light text-foreground mb-4 leading-[1.05] text-balance animate-fade-up">
+              <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light text-foreground mb-3 leading-[1.08] text-balance animate-fade-up">
                 Handmade with <span className="text-gold font-medium italic">Love</span>
               </h1>
               <p
-                className="font-display text-xl md:text-2xl text-muted-foreground mb-6 animate-fade-up"
+                className="font-display text-lg sm:text-xl md:text-2xl text-muted-foreground mb-6 animate-fade-up"
                 style={{ animationDelay: "0.2s" }}
               >
                 Crafted with Passion
               </p>
               <p
-                className="font-body text-muted-foreground max-w-xl mx-auto lg:mx-0 mb-10 animate-fade-up"
+                className="font-body text-sm sm:text-base text-muted-foreground/90 max-w-xl mx-auto lg:mx-0 mb-9 leading-relaxed animate-fade-up"
                 style={{ animationDelay: "0.4s" }}
               >
-                Every piece of Chitraboli jewellery is inspired by art, tradition, and passion.
-                Discover unique handcrafted pieces that make you shine.
+                A unique fusion of heritage and artistry. Discover our exclusive handmade
+                jewellery collections, created for your moments of elegance.
               </p>
               <div
                 className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start animate-fade-up"
@@ -58,32 +62,32 @@ const Index = () => {
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
-                <Button variant="hero" size="xl" asChild>
+                <Button variant="hero-gold-outline" size="xl" asChild>
                   <Link to="/collections">View Collections</Link>
                 </Button>
               </div>
             </div>
 
-            {/* Right: product image */}
+            {/* Right: product image with 3D depth */}
             <div className="relative order-1 lg:order-2 flex justify-center lg:justify-end animate-fade-up">
-              <div className="relative w-full max-w-[320px] sm:max-w-[420px] md:max-w-[520px] lg:max-w-none aspect-square">
+              <div className="relative w-full max-w-[300px] sm:max-w-[400px] md:max-w-[500px] lg:max-w-none aspect-square">
                 {/* Soft radial halo behind product */}
                 <div
-                  className="absolute inset-[10%] rounded-full blur-3xl opacity-70"
+                  className="absolute inset-[8%] rounded-full blur-3xl opacity-75"
                   style={{
                     background:
-                      "radial-gradient(circle at center, hsl(var(--gold) / 0.35), hsl(var(--primary) / 0.15) 45%, transparent 70%)",
+                      "radial-gradient(circle at center, hsl(var(--gold) / 0.38), hsl(var(--primary) / 0.18) 45%, transparent 70%)",
                   }}
                 />
                 <img
                   src={heroProduct.url}
-                  alt="Handcrafted Chitraboli pendant necklace with floral motif and matching earrings"
+                  alt="Handcrafted Chitraboli necklace with clay sitar motif, orange flowers and matching stud earrings"
                   width={880}
                   height={1180}
                   fetchPriority="high"
                   loading="eager"
                   decoding="async"
-                  className="relative z-10 w-full h-full object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.55)]"
+                  className="relative z-10 w-full h-full object-contain drop-shadow-[0_30px_60px_rgba(0,0,0,0.6)] lg:rotate-[-3deg] transition-transform duration-700 hover:rotate-0 hover:scale-[1.02]"
                 />
               </div>
             </div>
@@ -91,12 +95,16 @@ const Index = () => {
         </div>
 
         {/* Scroll Indicator */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 animate-bounce hidden sm:block">
-          <div className="w-6 h-10 border-2 border-muted-foreground/30 rounded-full flex justify-center pt-2">
-            <div className="w-1 h-2 bg-primary rounded-full animate-shimmer" />
+        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 hidden sm:flex flex-col items-center gap-2">
+          <div className="w-6 h-10 border-2 border-muted-foreground/30 rounded-full flex justify-center pt-2 animate-bounce">
+            <div className="w-1 h-2 bg-primary rounded-full" />
           </div>
+          <span className="font-body text-xs tracking-[0.2em] uppercase text-muted-foreground/70">
+            Explore
+          </span>
         </div>
       </section>
+
 
       {/* Features Section */}
       <section className="py-20 bg-card">
