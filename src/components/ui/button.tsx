@@ -20,6 +20,8 @@ const buttonVariants = cva(
         hero: "border-2 border-primary/60 bg-primary/10 text-foreground backdrop-blur-sm hover:bg-primary/20 hover:border-primary hover:shadow-gold font-medium tracking-wide",
         "hero-solid": "bg-gradient-to-r from-secondary to-purple-accent text-foreground font-semibold hover:shadow-glow hover:scale-105 active:scale-100 tracking-wide",
         "ghost-gold": "text-gold-light hover:text-primary hover:bg-primary/10 transition-colors",
+        "hero-gold-outline":
+          "border border-gold/60 bg-transparent text-gold hover:bg-gold/10 hover:border-gold font-medium tracking-wide",
       },
       size: {
         default: "h-10 px-4 py-2",
