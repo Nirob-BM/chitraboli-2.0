@@ -186,7 +186,11 @@ const ProductDetail = () => {
                   <div className="aspect-square overflow-hidden rounded-lg bg-muted border border-border/50">
                     <img
                       src={images[selectedImageIndex] || "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800"}
-                      alt={product.name}
+                      alt={`Handcrafted ${product.name} — view ${selectedImageIndex + 1}`}
+                      width={800}
+                      height={800}
+                      loading="eager"
+                      decoding="async"
                       className="w-full h-full object-cover"
                     />
                   </div>
