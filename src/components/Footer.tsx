@@ -94,9 +94,6 @@ export function Footer() {
           <p className="text-muted-foreground text-sm">
             © {new Date().getFullYear()} Chitraboli - চিত্রাবলী. All rights reserved.
           </p>
-
-          {/* AI Assistant embedded in footer */}
-          <DeferredAIAssistant />
         </div>
       </div>
     </footer>
