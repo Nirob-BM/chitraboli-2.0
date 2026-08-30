@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { ShoppingCart, ArrowLeft, Star, Minus, Plus, Check, Truck, Shield, RotateCcw } from "lucide-react";
 import { ReviewsSection } from "@/components/ReviewsSection";
+import { RelatedProducts } from "@/components/RelatedProducts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SEO } from "@/components/SEO";
 
@@ -357,6 +358,14 @@ const ProductDetail = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Related Products Carousel */}
+              <Separator className="mt-16" />
+              <RelatedProducts
+                currentProductId={product.id}
+                category={product.category}
+                tags={[...(product.colors ?? []), ...(product.sizes ?? [])]}
+              />
 
               {/* Reviews Section */}
               <div className="mt-16">
