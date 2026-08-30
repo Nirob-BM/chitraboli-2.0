@@ -96,7 +96,7 @@ const ProductDetail = () => {
         product_id: product.id,
         product_name: product.name,
         product_price: product.price,
-        product_image: product.image_url,
+        product_image: product.image_url ?? "",
       });
     }
     
