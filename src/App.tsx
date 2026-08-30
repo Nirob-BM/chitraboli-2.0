@@ -1,4 +1,4 @@
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useEffect, useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,6 +14,35 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { SkipToContent } from "@/components/SkipToContent";
 import { PageSkeleton } from "@/components/PageSkeleton";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+
+// Defer the AI Assistant chunk (TTS/voice/chat state) until the browser is idle,
+// so it never blocks the homepage's initial paint, TBT, or LCP. Rendered globally
+// so the floating widget appears on the right side of every page/device.
+const AIAssistant = lazy(() =>
+  import("./components/AIAssistant").then((m) => ({ default: m.AIAssistant }))
+);
+
+function DeferredAIAssistant() {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    const w = window as unknown as {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+    };
+    const trigger = () => setReady(true);
+    if (typeof w.requestIdleCallback === "function") {
+      w.requestIdleCallback(trigger, { timeout: 2500 });
+    } else {
+      const id = setTimeout(trigger, 2500);
+      return () => clearTimeout(id);
+    }
+  }, []);
+  if (!ready) return null;
+  return (
+    <Suspense fallback={null}>
+      <AIAssistant />
+    </Suspense>
+  );
+}
 
 // Lazy load pages for better performance (code splitting)
 const Index = lazy(() => import("./pages/Index"));
