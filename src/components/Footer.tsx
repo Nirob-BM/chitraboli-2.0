@@ -1,35 +1,5 @@
-import { lazy, Suspense, useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Mail, Phone, MapPin, MessageCircle } from "lucide-react";
-
-// Defer the AI Assistant chunk (TTS/voice/chat state) until the browser is idle,
-// so it never blocks the homepage's initial paint, TBT, or LCP.
-const AIAssistant = lazy(() =>
-  import("./AIAssistant").then((m) => ({ default: m.AIAssistant }))
-);
-
-function DeferredAIAssistant() {
-  const [ready, setReady] = useState(false);
-  useEffect(() => {
-    const w = window as unknown as {
-      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
-    };
-    const trigger = () => setReady(true);
-    // Load after the browser is idle, or 2.5s max as a safety net.
-    if (typeof w.requestIdleCallback === "function") {
-      w.requestIdleCallback(trigger, { timeout: 2500 });
-    } else {
-      const id = setTimeout(trigger, 2500);
-      return () => clearTimeout(id);
-    }
-  }, []);
-  if (!ready) return null;
-  return (
-    <Suspense fallback={null}>
-      <AIAssistant />
-    </Suspense>
-  );
-}
 
 export function Footer() {
   const location = useLocation();
