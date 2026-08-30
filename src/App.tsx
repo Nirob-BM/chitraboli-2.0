@@ -106,6 +106,7 @@ const AppContent = () => {
       </main>
       <CartDrawer />
       <BackToTop />
+      <DeferredAIAssistant />
     </>
   );
 };
