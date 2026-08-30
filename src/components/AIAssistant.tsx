@@ -465,8 +465,8 @@ export const AIAssistant = () => {
   };
 
   return (
-    <div className="relative">
-      {/* Toggle Button - positioned within footer */}
+    <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50">
+      {/* Toggle Button - floating on the right side of every device */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
@@ -477,17 +477,19 @@ export const AIAssistant = () => {
           "text-white text-sm font-medium"
         )}
         aria-label="Toggle AI Assistant"
+        aria-expanded={isOpen}
       >
         <Sparkles className="w-5 h-5" />
-        <span>AI Assistant</span>
+        <span className="hidden sm:inline">AI Assistant</span>
         {!isOpen && <span className="w-2 h-2 bg-gold rounded-full animate-pulse" />}
       </button>
 
-      {/* Chat Window - positioned above button within footer container */}
+      {/* Chat Window - floats above the button, responsive and fully visible */}
       <div
         className={cn(
           "absolute bottom-full right-0 mb-3",
-          "w-[340px] sm:w-[380px] h-[400px] sm:h-[450px]",
+          "w-[calc(100vw-2rem)] max-w-[380px]",
+          "h-[60vh] max-h-[450px] sm:h-[450px]",
           "bg-card/95 backdrop-blur-xl rounded-2xl",
           "border border-purple-accent/30",
           "shadow-[0_0_40px_rgba(139,92,246,0.3)]",
