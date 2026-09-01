@@ -529,6 +529,10 @@ export type Database = {
           id: string
           items: Json
           payment_method: string | null
+          payment_note: string | null
+          payment_status: string
+          payment_verified_at: string | null
+          payment_verified_by: string | null
           rider_assigned_at: string | null
           session_id: string | null
           status: string
@@ -547,6 +551,10 @@ export type Database = {
           id?: string
           items: Json
           payment_method?: string | null
+          payment_note?: string | null
+          payment_status?: string
+          payment_verified_at?: string | null
+          payment_verified_by?: string | null
           rider_assigned_at?: string | null
           session_id?: string | null
           status?: string
@@ -565,6 +573,10 @@ export type Database = {
           id?: string
           items?: Json
           payment_method?: string | null
+          payment_note?: string | null
+          payment_status?: string
+          payment_verified_at?: string | null
+          payment_verified_by?: string | null
           rider_assigned_at?: string | null
           session_id?: string | null
           status?: string
