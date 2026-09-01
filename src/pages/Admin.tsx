@@ -6,10 +6,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { 
-  Package, Phone, Mail, MapPin, Calendar, ExternalLink, LogOut, Loader2, 
-  CreditCard, Smartphone, Banknote, Search, Filter, Trash2, X, Bell, Bike, User as UserIcon
+import {
+  Package, Phone, Mail, MapPin, Calendar, ExternalLink, LogOut, Loader2,
+  CreditCard, Smartphone, Banknote, Search, Filter, Trash2, X, Bell, Bike, User as UserIcon,
+  BadgeCheck, BadgeX, Copy, ShieldQuestion
 } from "lucide-react";
+
 import { Layout } from "@/components/Layout";
 import { toast } from "sonner";
 import type { User, Session } from "@supabase/supabase-js";
