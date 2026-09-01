@@ -64,8 +64,12 @@ const quickReplies = {
   ]
 };
 
-export const AIAssistant = () => {
-  const [isOpen, setIsOpen] = useState(false);
+interface AIAssistantPanelProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export const AIAssistantPanel = ({ isOpen, onClose }: AIAssistantPanelProps) => {
   const [language, setLanguage] = useState<Language>("bn");
   const [showLanguageMenu, setShowLanguageMenu] = useState(false);
   const [messages, setMessages] = useState<Message[]>([{
