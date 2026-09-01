@@ -533,7 +533,7 @@ export const AIAssistantPanel = ({ isOpen, onClose }: AIAssistantPanelProps) => 
                 )}
               </div>
               <button
-                onClick={() => setIsOpen(false)}
+                onClick={onClose}
                 className="w-7 h-7 rounded-full bg-muted/50 flex items-center justify-center hover:bg-muted transition-colors"
                 aria-label="Close AI Assistant"
               >
