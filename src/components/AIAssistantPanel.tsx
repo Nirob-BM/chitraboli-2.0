@@ -669,6 +669,6 @@ export const AIAssistantPanel = ({ isOpen, onClose }: AIAssistantPanelProps) => 
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
