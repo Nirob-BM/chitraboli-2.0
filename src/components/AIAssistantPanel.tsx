@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { X, Send, Bot, User, Loader2, Sparkles, Globe, Mic, MicOff, Volume2, VolumeX } from "lucide-react";
+import { X, Send, Bot, User, Loader2, Globe, Mic, MicOff, Volume2, VolumeX } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
