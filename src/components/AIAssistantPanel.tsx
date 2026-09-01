@@ -469,26 +469,8 @@ export const AIAssistantPanel = ({ isOpen, onClose }: AIAssistantPanelProps) => 
   };
 
   return (
-    <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50">
-      {/* Toggle Button - floating on the right side of every device */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className={cn(
-          "flex items-center gap-2 px-4 py-2 rounded-full",
-          "bg-gradient-to-br from-purple-accent to-purple-accent/80",
-          "shadow-[0_0_20px_rgba(139,92,246,0.4)]",
-          "transition-all duration-300 hover:scale-105",
-          "text-white text-sm font-medium"
-        )}
-        aria-label="Toggle AI Assistant"
-        aria-expanded={isOpen}
-      >
-        <Sparkles className="w-5 h-5" />
-        <span className="hidden sm:inline">AI Assistant</span>
-        {!isOpen && <span className="w-2 h-2 bg-gold rounded-full animate-pulse" />}
-      </button>
-
-      {/* Chat Window - floats above the button, responsive and fully visible */}
+    <>
+      {/* Chat Window - floats above the launcher button, responsive and fully visible */}
       <div
         className={cn(
           "absolute bottom-full right-0 mb-3",
