@@ -499,7 +499,24 @@ const Admin = () => {
               />
             </div>
 
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+              <Select value={paymentStatusFilter} onValueChange={setPaymentStatusFilter}>
+                <SelectTrigger className="h-11 bg-background/50 border-border/50 rounded-xl">
+                  <div className="flex items-center gap-2">
+                    <BadgeCheck className="w-4 h-4 text-muted-foreground" />
+                    <SelectValue placeholder="Payment state" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  {PAYMENT_STATUSES.map((p) => (
+                    <SelectItem key={p.value} value={p.value} className="rounded-lg">
+                      {p.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="h-11 bg-background/50 border-border/50 rounded-xl">
                   <div className="flex items-center gap-2">
