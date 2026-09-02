@@ -361,7 +361,14 @@ const Admin = () => {
     navigate('/auth');
   };
 
+  const getPaymentStatusMeta = (paymentStatus?: string) => {
+    const value = paymentStatus || 'unpaid';
+    return PAYMENT_STATUSES.find(p => p.value === value)
+      ?? { value, label: value, color: 'bg-muted text-muted-foreground' };
+  };
+
   const getStatusColor = (status: string) => {
+
     const statusObj = ORDER_STATUSES.find(s => s.value === status);
     return statusObj?.color || 'bg-muted text-muted-foreground';
   };
