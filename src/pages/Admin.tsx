@@ -224,7 +224,41 @@ const Admin = () => {
     setLoading(false);
   };
 
+  const updatePaymentStatus = async (orderId: string, newPaymentStatus: string) => {
+    setUpdatingPayment(orderId);
+    try {
+      const { error } = await supabase
+        .from('orders')
+        .update({
+          payment_status: newPaymentStatus,
+          payment_verified_at: newPaymentStatus === 'verified' ? new Date().toISOString() : null,
+          payment_verified_by: newPaymentStatus === 'verified' ? (user?.id ?? null) : null,
+        })
+        .eq('id', orderId);
+
+      if (error) throw error;
+
+      const label = PAYMENT_STATUSES.find(p => p.value === newPaymentStatus)?.label ?? newPaymentStatus;
+      toast.success(`Payment marked as ${label}`);
+      fetchOrders();
+    } catch (error: any) {
+      toast.error(`Failed to update payment: ${error.message}`);
+    } finally {
+      setUpdatingPayment(null);
+    }
+  };
+
+  const copyTransactionId = async (txId: string) => {
+    try {
+      await navigator.clipboard.writeText(txId);
+      toast.success("Transaction ID copied");
+    } catch {
+      toast.error("Could not copy transaction ID");
+    }
+  };
+
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
+
     setUpdatingStatus(orderId);
     try {
       const order = orders.find(o => o.id === orderId);
