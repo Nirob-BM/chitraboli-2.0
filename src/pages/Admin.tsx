@@ -485,7 +485,27 @@ const Admin = () => {
 
   const renderOrdersContent = () => (
     <div className="space-y-6">
+      {pendingVerificationCount > 0 && (
+        <Card className="bg-yellow-500/10 border-yellow-500/30">
+          <CardContent className="p-4 flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-yellow-500 flex items-center gap-2">
+              <ShieldQuestion className="w-4 h-4" />
+              {pendingVerificationCount} payment{pendingVerificationCount > 1 ? 's' : ''} awaiting verification
+            </p>
+            <Button
+              size="sm"
+              variant="outline"
+              className="rounded-full"
+              onClick={() => setPaymentStatusFilter('pending_verification')}
+            >
+              Review now
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Filters Section */}
+
       <Card className="bg-card/80 backdrop-blur-sm border-border/50 shadow-lg">
         <CardContent className="p-4 sm:p-6">
           <div className="flex flex-col gap-4">
