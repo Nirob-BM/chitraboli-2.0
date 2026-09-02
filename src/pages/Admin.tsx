@@ -73,6 +73,9 @@ interface Order {
   created_at: string;
   payment_method?: string;
   transaction_id?: string;
+  payment_status?: string;
+  payment_verified_at?: string | null;
+  payment_note?: string | null;
   assigned_rider_id?: string | null;
   rider_assigned_at?: string | null;
   delivery_notes?: string | null;
@@ -82,9 +85,11 @@ const ORDER_STATUSES = [
   { value: 'all', label: 'All Orders', color: 'bg-muted text-muted-foreground' },
   { value: 'pending', label: 'Pending', color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' },
   { value: 'confirmed', label: 'Confirmed', color: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
+  { value: 'processing', label: 'Processing', color: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30' },
   { value: 'shipped', label: 'Shipped', color: 'bg-purple-500/20 text-purple-400 border-purple-500/30' },
   { value: 'delivered', label: 'Delivered', color: 'bg-green-500/20 text-green-400 border-green-500/30' },
   { value: 'cancelled', label: 'Cancelled', color: 'bg-red-500/20 text-red-400 border-red-500/30' },
+  { value: 'returned', label: 'Returned', color: 'bg-orange-500/20 text-orange-400 border-orange-500/30' },
 ];
 
 const PAYMENT_FILTERS = [
@@ -93,6 +98,16 @@ const PAYMENT_FILTERS = [
   { value: 'bkash', label: 'bKash' },
   { value: 'nagad', label: 'Nagad' },
 ];
+
+const PAYMENT_STATUSES = [
+  { value: 'all', label: 'All Payment States', color: 'bg-muted text-muted-foreground' },
+  { value: 'unpaid', label: 'Unpaid', color: 'bg-muted text-muted-foreground border-border' },
+  { value: 'pending_verification', label: 'Awaiting Verification', color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' },
+  { value: 'verified', label: 'Payment Verified', color: 'bg-green-500/20 text-green-400 border-green-500/30' },
+  { value: 'rejected', label: 'Payment Rejected', color: 'bg-red-500/20 text-red-400 border-red-500/30' },
+  { value: 'refunded', label: 'Refunded', color: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
+];
+
 
 const Admin = () => {
   const [orders, setOrders] = useState<Order[]>([]);
