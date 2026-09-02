@@ -400,6 +400,8 @@ const Admin = () => {
     const matchesStatus = statusFilter === "all" || order.status === statusFilter;
     const matchesPayment = paymentFilter === "all" || 
       (order.payment_method || 'cod') === paymentFilter;
+    const matchesPaymentStatus = paymentStatusFilter === "all" ||
+      (order.payment_status || 'unpaid') === paymentStatusFilter;
 
     let matchesDate = true;
     if (dateFilter !== "all") {
@@ -416,17 +418,23 @@ const Admin = () => {
       }
     }
 
-    return matchesSearch && matchesStatus && matchesPayment && matchesDate;
+    return matchesSearch && matchesStatus && matchesPayment && matchesPaymentStatus && matchesDate;
   });
+
+  const pendingVerificationCount = orders.filter(
+    (o) => (o.payment_status || 'unpaid') === 'pending_verification'
+  ).length;
 
   const clearFilters = () => {
     setSearchQuery("");
     setStatusFilter("all");
     setPaymentFilter("all");
+    setPaymentStatusFilter("all");
     setDateFilter("all");
   };
 
-  const hasActiveFilters = searchQuery || statusFilter !== "all" || paymentFilter !== "all" || dateFilter !== "all";
+  const hasActiveFilters = searchQuery || statusFilter !== "all" || paymentFilter !== "all" || paymentStatusFilter !== "all" || dateFilter !== "all";
+
 
   // Render content based on active tab
   const renderContent = () => {
