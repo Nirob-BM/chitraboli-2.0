@@ -710,22 +710,78 @@ const Admin = () => {
                             <Banknote className="w-5 h-5 text-green-500" />
                           )}
                         </div>
-                        <div>
+                        <div className="flex-1">
                           <p className="text-sm text-muted-foreground">Payment Method</p>
                           <p className="font-medium capitalize">
                             {order.payment_method === 'cod' ? 'Cash on Delivery' : order.payment_method || 'COD'}
                           </p>
                         </div>
+                        <Badge className={`${getPaymentStatusMeta(order.payment_status).color} rounded-full px-3 whitespace-nowrap`}>
+                          {getPaymentStatusMeta(order.payment_status).label}
+                        </Badge>
                       </div>
                       {order.transaction_id && (
-                        <div className="flex items-center gap-3 pl-[52px]">
+                        <div className="flex items-center gap-2 pl-[52px]">
                           <span className="text-sm text-muted-foreground">TxID:</span>
                           <code className="font-mono text-xs bg-muted/50 px-3 py-1.5 rounded-full truncate max-w-[180px] sm:max-w-none">
                             {order.transaction_id}
                           </code>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 rounded-full"
+                            aria-label="Copy transaction ID"
+                            onClick={() => copyTransactionId(order.transaction_id!)}
+                          >
+                            <Copy className="w-4 h-4" />
+                          </Button>
                         </div>
                       )}
+                      {order.payment_verified_at && (
+                        <p className="text-xs text-muted-foreground pl-[52px] mt-2">
+                          Verified on {formatDate(order.payment_verified_at)}
+                        </p>
+                      )}
+                      <div className="flex flex-wrap items-center gap-2 pl-[52px] mt-3">
+                        {updatingPayment === order.id ? (
+                          <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+                        ) : (
+                          <>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="rounded-full gap-1.5 h-8"
+                              disabled={order.payment_status === 'verified'}
+                              onClick={() => updatePaymentStatus(order.id, 'verified')}
+                            >
+                              <BadgeCheck className="w-4 h-4" />
+                              Verify
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="rounded-full gap-1.5 h-8"
+                              disabled={order.payment_status === 'rejected'}
+                              onClick={() => updatePaymentStatus(order.id, 'rejected')}
+                            >
+                              <BadgeX className="w-4 h-4" />
+                              Reject
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="rounded-full gap-1.5 h-8 text-muted-foreground"
+                              disabled={order.payment_status === 'pending_verification'}
+                              onClick={() => updatePaymentStatus(order.id, 'pending_verification')}
+                            >
+                              <ShieldQuestion className="w-4 h-4" />
+                              Awaiting
+                            </Button>
+                          </>
+                        )}
+                      </div>
                     </div>
+
                   </div>
 
                   {/* Order Items */}
