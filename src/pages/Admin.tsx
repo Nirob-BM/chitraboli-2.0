@@ -133,7 +133,10 @@ const Admin = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [paymentFilter, setPaymentFilter] = useState("all");
+  const [paymentStatusFilter, setPaymentStatusFilter] = useState("all");
   const [dateFilter, setDateFilter] = useState("all");
+  const [updatingPayment, setUpdatingPayment] = useState<string | null>(null);
+
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
