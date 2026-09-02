@@ -73,6 +73,9 @@ interface Order {
   created_at: string;
   payment_method?: string;
   transaction_id?: string;
+  payment_status?: string;
+  payment_verified_at?: string | null;
+  payment_note?: string | null;
   assigned_rider_id?: string | null;
   rider_assigned_at?: string | null;
   delivery_notes?: string | null;
@@ -82,9 +85,11 @@ const ORDER_STATUSES = [
   { value: 'all', label: 'All Orders', color: 'bg-muted text-muted-foreground' },
   { value: 'pending', label: 'Pending', color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' },
   { value: 'confirmed', label: 'Confirmed', color: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
+  { value: 'processing', label: 'Processing', color: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30' },
   { value: 'shipped', label: 'Shipped', color: 'bg-purple-500/20 text-purple-400 border-purple-500/30' },
   { value: 'delivered', label: 'Delivered', color: 'bg-green-500/20 text-green-400 border-green-500/30' },
   { value: 'cancelled', label: 'Cancelled', color: 'bg-red-500/20 text-red-400 border-red-500/30' },
+  { value: 'returned', label: 'Returned', color: 'bg-orange-500/20 text-orange-400 border-orange-500/30' },
 ];
 
 const PAYMENT_FILTERS = [
@@ -93,6 +98,16 @@ const PAYMENT_FILTERS = [
   { value: 'bkash', label: 'bKash' },
   { value: 'nagad', label: 'Nagad' },
 ];
+
+const PAYMENT_STATUSES = [
+  { value: 'all', label: 'All Payment States', color: 'bg-muted text-muted-foreground' },
+  { value: 'unpaid', label: 'Unpaid', color: 'bg-muted text-muted-foreground border-border' },
+  { value: 'pending_verification', label: 'Awaiting Verification', color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' },
+  { value: 'verified', label: 'Payment Verified', color: 'bg-green-500/20 text-green-400 border-green-500/30' },
+  { value: 'rejected', label: 'Payment Rejected', color: 'bg-red-500/20 text-red-400 border-red-500/30' },
+  { value: 'refunded', label: 'Refunded', color: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
+];
+
 
 const Admin = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -118,7 +133,10 @@ const Admin = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [paymentFilter, setPaymentFilter] = useState("all");
+  const [paymentStatusFilter, setPaymentStatusFilter] = useState("all");
   const [dateFilter, setDateFilter] = useState("all");
+  const [updatingPayment, setUpdatingPayment] = useState<string | null>(null);
+
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
@@ -206,7 +224,41 @@ const Admin = () => {
     setLoading(false);
   };
 
+  const updatePaymentStatus = async (orderId: string, newPaymentStatus: string) => {
+    setUpdatingPayment(orderId);
+    try {
+      const { error } = await supabase
+        .from('orders')
+        .update({
+          payment_status: newPaymentStatus,
+          payment_verified_at: newPaymentStatus === 'verified' ? new Date().toISOString() : null,
+          payment_verified_by: newPaymentStatus === 'verified' ? (user?.id ?? null) : null,
+        })
+        .eq('id', orderId);
+
+      if (error) throw error;
+
+      const label = PAYMENT_STATUSES.find(p => p.value === newPaymentStatus)?.label ?? newPaymentStatus;
+      toast.success(`Payment marked as ${label}`);
+      fetchOrders();
+    } catch (error: any) {
+      toast.error(`Failed to update payment: ${error.message}`);
+    } finally {
+      setUpdatingPayment(null);
+    }
+  };
+
+  const copyTransactionId = async (txId: string) => {
+    try {
+      await navigator.clipboard.writeText(txId);
+      toast.success("Transaction ID copied");
+    } catch {
+      toast.error("Could not copy transaction ID");
+    }
+  };
+
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
+
     setUpdatingStatus(orderId);
     try {
       const order = orders.find(o => o.id === orderId);
@@ -309,7 +361,14 @@ const Admin = () => {
     navigate('/auth');
   };
 
+  const getPaymentStatusMeta = (paymentStatus?: string) => {
+    const value = paymentStatus || 'unpaid';
+    return PAYMENT_STATUSES.find(p => p.value === value)
+      ?? { value, label: value, color: 'bg-muted text-muted-foreground' };
+  };
+
   const getStatusColor = (status: string) => {
+
     const statusObj = ORDER_STATUSES.find(s => s.value === status);
     return statusObj?.color || 'bg-muted text-muted-foreground';
   };
@@ -348,6 +407,8 @@ const Admin = () => {
     const matchesStatus = statusFilter === "all" || order.status === statusFilter;
     const matchesPayment = paymentFilter === "all" || 
       (order.payment_method || 'cod') === paymentFilter;
+    const matchesPaymentStatus = paymentStatusFilter === "all" ||
+      (order.payment_status || 'unpaid') === paymentStatusFilter;
 
     let matchesDate = true;
     if (dateFilter !== "all") {
@@ -364,17 +425,23 @@ const Admin = () => {
       }
     }
 
-    return matchesSearch && matchesStatus && matchesPayment && matchesDate;
+    return matchesSearch && matchesStatus && matchesPayment && matchesPaymentStatus && matchesDate;
   });
+
+  const pendingVerificationCount = orders.filter(
+    (o) => (o.payment_status || 'unpaid') === 'pending_verification'
+  ).length;
 
   const clearFilters = () => {
     setSearchQuery("");
     setStatusFilter("all");
     setPaymentFilter("all");
+    setPaymentStatusFilter("all");
     setDateFilter("all");
   };
 
-  const hasActiveFilters = searchQuery || statusFilter !== "all" || paymentFilter !== "all" || dateFilter !== "all";
+  const hasActiveFilters = searchQuery || statusFilter !== "all" || paymentFilter !== "all" || paymentStatusFilter !== "all" || dateFilter !== "all";
+
 
   // Render content based on active tab
   const renderContent = () => {
@@ -418,7 +485,27 @@ const Admin = () => {
 
   const renderOrdersContent = () => (
     <div className="space-y-6">
+      {pendingVerificationCount > 0 && (
+        <Card className="bg-yellow-500/10 border-yellow-500/30">
+          <CardContent className="p-4 flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-yellow-500 flex items-center gap-2">
+              <ShieldQuestion className="w-4 h-4" />
+              {pendingVerificationCount} payment{pendingVerificationCount > 1 ? 's' : ''} awaiting verification
+            </p>
+            <Button
+              size="sm"
+              variant="outline"
+              className="rounded-full"
+              onClick={() => setPaymentStatusFilter('pending_verification')}
+            >
+              Review now
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Filters Section */}
+
       <Card className="bg-card/80 backdrop-blur-sm border-border/50 shadow-lg">
         <CardContent className="p-4 sm:p-6">
           <div className="flex flex-col gap-4">
@@ -432,7 +519,24 @@ const Admin = () => {
               />
             </div>
 
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+              <Select value={paymentStatusFilter} onValueChange={setPaymentStatusFilter}>
+                <SelectTrigger className="h-11 bg-background/50 border-border/50 rounded-xl">
+                  <div className="flex items-center gap-2">
+                    <BadgeCheck className="w-4 h-4 text-muted-foreground" />
+                    <SelectValue placeholder="Payment state" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  {PAYMENT_STATUSES.map((p) => (
+                    <SelectItem key={p.value} value={p.value} className="rounded-lg">
+                      {p.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="h-11 bg-background/50 border-border/50 rounded-xl">
                   <div className="flex items-center gap-2">
@@ -626,22 +730,78 @@ const Admin = () => {
                             <Banknote className="w-5 h-5 text-green-500" />
                           )}
                         </div>
-                        <div>
+                        <div className="flex-1">
                           <p className="text-sm text-muted-foreground">Payment Method</p>
                           <p className="font-medium capitalize">
                             {order.payment_method === 'cod' ? 'Cash on Delivery' : order.payment_method || 'COD'}
                           </p>
                         </div>
+                        <Badge className={`${getPaymentStatusMeta(order.payment_status).color} rounded-full px-3 whitespace-nowrap`}>
+                          {getPaymentStatusMeta(order.payment_status).label}
+                        </Badge>
                       </div>
                       {order.transaction_id && (
-                        <div className="flex items-center gap-3 pl-[52px]">
+                        <div className="flex items-center gap-2 pl-[52px]">
                           <span className="text-sm text-muted-foreground">TxID:</span>
                           <code className="font-mono text-xs bg-muted/50 px-3 py-1.5 rounded-full truncate max-w-[180px] sm:max-w-none">
                             {order.transaction_id}
                           </code>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 rounded-full"
+                            aria-label="Copy transaction ID"
+                            onClick={() => copyTransactionId(order.transaction_id!)}
+                          >
+                            <Copy className="w-4 h-4" />
+                          </Button>
                         </div>
                       )}
+                      {order.payment_verified_at && (
+                        <p className="text-xs text-muted-foreground pl-[52px] mt-2">
+                          Verified on {formatDate(order.payment_verified_at)}
+                        </p>
+                      )}
+                      <div className="flex flex-wrap items-center gap-2 pl-[52px] mt-3">
+                        {updatingPayment === order.id ? (
+                          <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+                        ) : (
+                          <>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="rounded-full gap-1.5 h-8"
+                              disabled={order.payment_status === 'verified'}
+                              onClick={() => updatePaymentStatus(order.id, 'verified')}
+                            >
+                              <BadgeCheck className="w-4 h-4" />
+                              Verify
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="rounded-full gap-1.5 h-8"
+                              disabled={order.payment_status === 'rejected'}
+                              onClick={() => updatePaymentStatus(order.id, 'rejected')}
+                            >
+                              <BadgeX className="w-4 h-4" />
+                              Reject
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="rounded-full gap-1.5 h-8 text-muted-foreground"
+                              disabled={order.payment_status === 'pending_verification'}
+                              onClick={() => updatePaymentStatus(order.id, 'pending_verification')}
+                            >
+                              <ShieldQuestion className="w-4 h-4" />
+                              Awaiting
+                            </Button>
+                          </>
+                        )}
+                      </div>
                     </div>
+
                   </div>
 
                   {/* Order Items */}
