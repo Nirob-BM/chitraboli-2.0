@@ -528,6 +528,7 @@ export type Database = {
           delivery_notes: string | null
           id: string
           items: Json
+          payment_gateway: string | null
           payment_method: string | null
           payment_note: string | null
           payment_status: string
@@ -550,6 +551,7 @@ export type Database = {
           delivery_notes?: string | null
           id?: string
           items: Json
+          payment_gateway?: string | null
           payment_method?: string | null
           payment_note?: string | null
           payment_status?: string
@@ -572,6 +574,7 @@ export type Database = {
           delivery_notes?: string | null
           id?: string
           items?: Json
+          payment_gateway?: string | null
           payment_method?: string | null
           payment_note?: string | null
           payment_status?: string
@@ -626,6 +629,71 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      payment_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          environment: string
+          failure_reason: string | null
+          gateway_payment_id: string | null
+          gateway_transaction_id: string | null
+          id: string
+          invoice_number: string
+          order_id: string
+          payer_reference: string | null
+          provider: string
+          raw_response: Json | null
+          return_url: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          environment?: string
+          failure_reason?: string | null
+          gateway_payment_id?: string | null
+          gateway_transaction_id?: string | null
+          id?: string
+          invoice_number: string
+          order_id: string
+          payer_reference?: string | null
+          provider: string
+          raw_response?: Json | null
+          return_url?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          environment?: string
+          failure_reason?: string | null
+          gateway_payment_id?: string | null
+          gateway_transaction_id?: string | null
+          id?: string
+          invoice_number?: string
+          order_id?: string
+          payer_reference?: string | null
+          provider?: string
+          raw_response?: Json | null
+          return_url?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_transactions_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       products: {
         Row: {
