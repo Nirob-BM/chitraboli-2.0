@@ -71,6 +71,39 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
   const [transactionId, setTransactionId] = useState("");
   const [whatsappUrl, setWhatsappUrl] = useState<string | null>(null);
   const [hasRestoredProgress, setHasRestoredProgress] = useState(false);
+  const [paymentFlow, setPaymentFlow] = useState<PaymentFlow>("gateway");
+  const [gatewayAvailable, setGatewayAvailable] = useState<boolean | null>(null);
+  const [checkingGateway, setCheckingGateway] = useState(false);
+
+  const isMobileBanking = paymentMethod === "bkash" || paymentMethod === "nagad";
+
+  // Ask the backend whether the selected wallet's automatic checkout is connected.
+  // If it isn't, the manual "send money + paste transaction ID" flow is used.
+  useEffect(() => {
+    if (!open || !isMobileBanking) return;
+    let cancelled = false;
+    setCheckingGateway(true);
+    setGatewayAvailable(null);
+    supabase.functions
+      .invoke("payment-initiate", { body: { check: true, provider: paymentMethod } })
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        const available = !error && data?.configured === true;
+        setGatewayAvailable(available);
+        setPaymentFlow(available ? "gateway" : "manual");
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setGatewayAvailable(false);
+        setPaymentFlow("manual");
+      })
+      .finally(() => {
+        if (!cancelled) setCheckingGateway(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [open, isMobileBanking, paymentMethod]);
 
   const PAYMENT_NUMBER = "01308697630";
 
