@@ -50,6 +50,7 @@ serve(async (req) => {
     
     const body: CreateOrderRequest = await req.json();
     const { items, customer_details, payment_method, transaction_id, session_id } = body;
+    const paymentFlow: 'gateway' | 'manual' = body.payment_flow === 'gateway' ? 'gateway' : 'manual';
 
     console.log('Received order request:', { 
       itemCount: items?.length, 
