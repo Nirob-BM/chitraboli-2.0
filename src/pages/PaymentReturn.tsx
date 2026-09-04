@@ -30,7 +30,6 @@ const PaymentReturn = () => {
       <SEO
         title={isSuccess ? "Payment Successful | Chitraboli" : "Payment Not Completed | Chitraboli"}
         description="Payment result for your Chitraboli order."
-        noindex
       />
       <section className="container mx-auto px-4 py-16 sm:py-24">
         <div className="mx-auto max-w-md rounded-2xl border border-gold/20 bg-card p-8 text-center">
