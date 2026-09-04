@@ -799,12 +799,12 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
                 {isSubmitting ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Placing Order...
+                    {isMobileBanking && paymentFlow === "gateway" ? "Opening payment..." : "Placing Order..."}
                   </>
                 ) : (
                   <>
                     <CheckCircle className="w-4 h-4 mr-2" />
-                    Place Order
+                    {isMobileBanking && paymentFlow === "gateway" ? "Confirm & Pay" : "Place Order"}
                   </>
                 )}
               </Button>
