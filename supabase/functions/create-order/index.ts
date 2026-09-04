@@ -113,8 +113,13 @@ serve(async (req) => {
       );
     }
 
-    // Require transaction ID for mobile payments
-    if ((payment_method === 'bkash' || payment_method === 'nagad') && (!transaction_id || transaction_id.trim().length === 0)) {
+    // Require transaction ID for manually-sent mobile payments only.
+    // Gateway payments get their transaction ID from the provider after checkout.
+    if (
+      paymentFlow === 'manual' &&
+      (payment_method === 'bkash' || payment_method === 'nagad') &&
+      (!transaction_id || transaction_id.trim().length === 0)
+    ) {
       return new Response(
         JSON.stringify({ error: 'Transaction ID is required for mobile payments' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
