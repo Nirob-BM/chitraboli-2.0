@@ -27,6 +27,12 @@ interface CreateOrderRequest {
   payment_method: 'cod' | 'bkash' | 'nagad';
   transaction_id?: string;
   session_id?: string;
+  /**
+   * 'gateway' means the customer will pay through the automated bKash/Nagad
+   * checkout right after the order is created, so no transaction ID is typed in.
+   * 'manual' means they sent money themselves and pasted a transaction ID.
+   */
+  payment_flow?: 'gateway' | 'manual';
 }
 
 serve(async (req) => {
