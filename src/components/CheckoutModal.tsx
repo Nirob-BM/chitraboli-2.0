@@ -739,9 +739,13 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
                     {paymentMethodLabel}
                   </span>
                 </div>
-                {transactionId && (
+                {isMobileBanking && paymentFlow === "gateway" ? (
+                  <p className="text-sm text-muted-foreground">
+                    You'll be taken to {paymentMethod === "bkash" ? "bKash" : "Nagad"} to pay after confirming.
+                  </p>
+                ) : transactionId ? (
                   <p className="text-sm"><span className="text-muted-foreground">Transaction ID:</span> {transactionId}</p>
-                )}
+                ) : null}
               </div>
 
               <div className="bg-muted/50 rounded-lg p-4 space-y-3">
