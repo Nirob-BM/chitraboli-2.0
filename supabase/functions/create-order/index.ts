@@ -215,7 +215,11 @@ serve(async (req) => {
         total_amount: totalAmount, // Server-calculated total
         status: 'pending',
         payment_method: payment_method,
-        transaction_id: payment_method !== 'cod' ? transaction_id?.trim() : null,
+        transaction_id: payment_method !== 'cod' && paymentFlow === 'manual' ? transaction_id?.trim() : null,
+        payment_status: payment_method === 'cod'
+          ? 'unpaid'
+          : paymentFlow === 'manual' ? 'pending_verification' : 'unpaid',
+        payment_gateway: payment_method !== 'cod' && paymentFlow === 'gateway' ? payment_method : null,
       }])
       .select()
       .single();
