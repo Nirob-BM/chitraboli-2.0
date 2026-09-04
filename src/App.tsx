@@ -54,6 +54,7 @@ const Admin = lazy(() => import("./pages/Admin"));
 const Auth = lazy(() => import("./pages/Auth"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const TrackOrder = lazy(() => import("./pages/TrackOrder"));
+const PaymentReturn = lazy(() => import("./pages/PaymentReturn"));
 const ProductDetail = lazy(() => import("./pages/ProductDetail"));
 const Profile = lazy(() => import("./pages/Profile"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -91,6 +92,7 @@ const AppContent = () => {
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/track-order" element={<TrackOrder />} />
+            <Route path="/payment/return" element={<PaymentReturn />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/admin" element={<ProtectedRoute requireAdmin><Admin /></ProtectedRoute>} />
             <Route path="/auth" element={<Auth />} />

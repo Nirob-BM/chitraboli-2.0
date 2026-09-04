@@ -29,6 +29,8 @@ const CustomerDetailsSchema = z.object({
   address: z.string().min(10, "Please enter a complete address").max(500, "Address is too long"),
 });
 
+type PaymentFlow = "gateway" | "manual";
+
 interface CheckoutProgress {
   formData: { name: string; email: string; phone: string; address: string };
   paymentMethod: "cod" | "bkash" | "nagad";
@@ -69,6 +71,39 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
   const [transactionId, setTransactionId] = useState("");
   const [whatsappUrl, setWhatsappUrl] = useState<string | null>(null);
   const [hasRestoredProgress, setHasRestoredProgress] = useState(false);
+  const [paymentFlow, setPaymentFlow] = useState<PaymentFlow>("gateway");
+  const [gatewayAvailable, setGatewayAvailable] = useState<boolean | null>(null);
+  const [checkingGateway, setCheckingGateway] = useState(false);
+
+  const isMobileBanking = paymentMethod === "bkash" || paymentMethod === "nagad";
+
+  // Ask the backend whether the selected wallet's automatic checkout is connected.
+  // If it isn't, the manual "send money + paste transaction ID" flow is used.
+  useEffect(() => {
+    if (!open || !isMobileBanking) return;
+    let cancelled = false;
+    setCheckingGateway(true);
+    setGatewayAvailable(null);
+    supabase.functions
+      .invoke("payment-initiate", { body: { check: true, provider: paymentMethod } })
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        const available = !error && data?.configured === true;
+        setGatewayAvailable(available);
+        setPaymentFlow(available ? "gateway" : "manual");
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setGatewayAvailable(false);
+        setPaymentFlow("manual");
+      })
+      .finally(() => {
+        if (!cancelled) setCheckingGateway(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [open, isMobileBanking, paymentMethod]);
 
   const PAYMENT_NUMBER = "01308697630";
 
@@ -146,7 +181,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
       return true;
     }
     if (step === 1) {
-      if ((paymentMethod === "bkash" || paymentMethod === "nagad") && !transactionId.trim()) {
+      if (isMobileBanking && paymentFlow === "manual" && !transactionId.trim()) {
         setFieldErrors({ transactionId: "Transaction ID is required for mobile banking" });
         return false;
       }
@@ -192,7 +227,9 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
             address: formData.address,
           },
           payment_method: paymentMethod,
-          transaction_id: paymentMethod !== "cod" ? transactionId.trim() : undefined,
+          transaction_id:
+            paymentMethod !== "cod" && paymentFlow === "manual" ? transactionId.trim() : undefined,
+          payment_flow: isMobileBanking ? paymentFlow : "manual",
           session_id: sessionId,
         },
       });
@@ -209,6 +246,41 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
       }
 
       const orderData = response.order;
+
+      // Automatic wallet payment: hand the customer over to the bKash/Nagad
+      // checkout. The gateway redirects back to /payment/return once done.
+      if (isMobileBanking && paymentFlow === "gateway") {
+        const { data: payment, error: paymentError } = await supabase.functions.invoke(
+          "payment-initiate",
+          {
+            body: {
+              order_id: orderData.id,
+              provider: paymentMethod,
+              return_origin: window.location.origin,
+            },
+          }
+        );
+
+        if (paymentError || !payment?.redirect_url) {
+          if (payment?.configured === false) {
+            setGatewayAvailable(false);
+            setPaymentFlow("manual");
+            setCurrentStep(1);
+            toast({
+              title: "Automatic payment unavailable",
+              description:
+                "Please send the money from your app and enter the transaction ID instead.",
+              variant: "destructive",
+            });
+            return;
+          }
+          throw new Error(payment?.error || "Could not open the payment page. Please try again.");
+        }
+
+        clearProgress();
+        window.location.href = payment.redirect_url as string;
+        return;
+      }
 
       // Use server-validated total amount for WhatsApp message
       const serverTotalAmount = orderData.total_amount;
@@ -538,52 +610,98 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
                       {paymentMethod === "bkash" ? "bKash" : "Nagad"} Payment
                     </span>
                   </div>
-                  
-                  <ol className="text-sm text-muted-foreground space-y-1.5 list-decimal list-inside mb-4">
-                    <li>Open your {paymentMethod === "bkash" ? "bKash" : "Nagad"} app</li>
-                    <li>Select <strong>"Send Money"</strong></li>
-                    <li>Send <strong className={paymentMethod === "bkash" ? "text-[#E2136E]" : "text-[#F6921E]"}>৳{totalPrice.toLocaleString()}</strong> to:</li>
-                  </ol>
 
-                  <div className={`flex items-center gap-2 p-3 rounded-lg border ${
-                    paymentMethod === "bkash" 
-                      ? "bg-[#E2136E]/10 border-[#E2136E]/30" 
-                      : "bg-[#F6921E]/10 border-[#F6921E]/30"
-                  }`}>
-                    <span className={`font-mono font-bold text-lg flex-1 ${
-                      paymentMethod === "bkash" ? "text-[#E2136E]" : "text-[#F6921E]"
-                    }`}>
-                      {PAYMENT_NUMBER}
-                    </span>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => copyToClipboard(PAYMENT_NUMBER)}
-                      className="h-8 px-3 hover:bg-background/50"
-                    >
-                      <Copy className="w-4 h-4 mr-1" />
-                      Copy
-                    </Button>
-                  </div>
+                  {checkingGateway && (
+                    <p className="text-sm text-muted-foreground flex items-center gap-2 mb-3">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Checking payment options...
+                    </p>
+                  )}
 
-                  <div className="mt-4 space-y-1.5">
-                    <label className="text-sm font-medium text-foreground">Transaction ID *</label>
-                    <Input
-                      value={transactionId}
-                      onChange={(e) => {
-                        setTransactionId(e.target.value);
-                        if (fieldErrors.transactionId) setFieldErrors({});
-                      }}
-                      className={`bg-background ${
+                  {gatewayAvailable && (
+                    <div className="flex flex-col sm:flex-row gap-2 mb-4">
+                      <Button
+                        type="button"
+                        variant={paymentFlow === "gateway" ? "default" : "outline"}
+                        size="sm"
+                        className="flex-1"
+                        onClick={() => {
+                          setPaymentFlow("gateway");
+                          setFieldErrors({});
+                        }}
+                      >
+                        Pay now in app
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={paymentFlow === "manual" ? "default" : "outline"}
+                        size="sm"
+                        className="flex-1"
+                        onClick={() => setPaymentFlow("manual")}
+                      >
+                        I'll send money myself
+                      </Button>
+                    </div>
+                  )}
+
+                  {paymentFlow === "gateway" ? (
+                    <p className="text-sm text-muted-foreground">
+                      After you confirm the order, you'll be taken to the secure{" "}
+                      {paymentMethod === "bkash" ? "bKash" : "Nagad"} page to pay{" "}
+                      <strong className={paymentMethod === "bkash" ? "text-[#E2136E]" : "text-[#F6921E]"}>
+                        ৳{totalPrice.toLocaleString()}
+                      </strong>
+                      . Your payment is confirmed automatically — no transaction ID needed.
+                    </p>
+                  ) : (
+                    <>
+                      <ol className="text-sm text-muted-foreground space-y-1.5 list-decimal list-inside mb-4">
+                        <li>Open your {paymentMethod === "bkash" ? "bKash" : "Nagad"} app</li>
+                        <li>Select <strong>"Send Money"</strong></li>
+                        <li>Send <strong className={paymentMethod === "bkash" ? "text-[#E2136E]" : "text-[#F6921E]"}>৳{totalPrice.toLocaleString()}</strong> to:</li>
+                      </ol>
+
+                      <div className={`flex items-center gap-2 p-3 rounded-lg border ${
                         paymentMethod === "bkash" 
-                          ? "border-[#E2136E]/30 focus:border-[#E2136E]" 
-                          : "border-[#F6921E]/30 focus:border-[#F6921E]"
-                      } ${fieldErrors.transactionId ? "border-destructive" : ""}`}
-                      placeholder="e.g., TXN123456789"
-                    />
-                    {fieldErrors.transactionId && <p className="text-xs text-destructive">{fieldErrors.transactionId}</p>}
-                  </div>
+                          ? "bg-[#E2136E]/10 border-[#E2136E]/30" 
+                          : "bg-[#F6921E]/10 border-[#F6921E]/30"
+                      }`}>
+                        <span className={`font-mono font-bold text-lg flex-1 ${
+                          paymentMethod === "bkash" ? "text-[#E2136E]" : "text-[#F6921E]"
+                        }`}>
+                          {PAYMENT_NUMBER}
+                        </span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => copyToClipboard(PAYMENT_NUMBER)}
+                          className="h-8 px-3 hover:bg-background/50"
+                        >
+                          <Copy className="w-4 h-4 mr-1" />
+                          Copy
+                        </Button>
+                      </div>
+
+                      <div className="mt-4 space-y-1.5">
+                        <label className="text-sm font-medium text-foreground">Transaction ID *</label>
+                        <Input
+                          value={transactionId}
+                          onChange={(e) => {
+                            setTransactionId(e.target.value);
+                            if (fieldErrors.transactionId) setFieldErrors({});
+                          }}
+                          className={`bg-background ${
+                            paymentMethod === "bkash" 
+                              ? "border-[#E2136E]/30 focus:border-[#E2136E]" 
+                              : "border-[#F6921E]/30 focus:border-[#F6921E]"
+                          } ${fieldErrors.transactionId ? "border-destructive" : ""}`}
+                          placeholder="e.g., TXN123456789"
+                        />
+                        {fieldErrors.transactionId && <p className="text-xs text-destructive">{fieldErrors.transactionId}</p>}
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
             </div>
@@ -621,9 +739,13 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
                     {paymentMethodLabel}
                   </span>
                 </div>
-                {transactionId && (
+                {isMobileBanking && paymentFlow === "gateway" ? (
+                  <p className="text-sm text-muted-foreground">
+                    You'll be taken to {paymentMethod === "bkash" ? "bKash" : "Nagad"} to pay after confirming.
+                  </p>
+                ) : transactionId ? (
                   <p className="text-sm"><span className="text-muted-foreground">Transaction ID:</span> {transactionId}</p>
-                )}
+                ) : null}
               </div>
 
               <div className="bg-muted/50 rounded-lg p-4 space-y-3">
@@ -677,12 +799,12 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
                 {isSubmitting ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Placing Order...
+                    {isMobileBanking && paymentFlow === "gateway" ? "Opening payment..." : "Placing Order..."}
                   </>
                 ) : (
                   <>
                     <CheckCircle className="w-4 h-4 mr-2" />
-                    Place Order
+                    {isMobileBanking && paymentFlow === "gateway" ? "Confirm & Pay" : "Place Order"}
                   </>
                 )}
               </Button>

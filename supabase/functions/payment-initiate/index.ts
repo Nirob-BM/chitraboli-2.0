@@ -43,6 +43,14 @@ serve(async (req) => {
     const provider = body?.provider as Provider;
     const returnOrigin = typeof body?.return_origin === "string" ? body.return_origin : "";
 
+    // Availability probe used by checkout to decide between automatic payment
+    // and the manual "send money + paste transaction ID" fallback.
+    if (body?.check === true) {
+      const available = provider === "nagad" ? getNagadConfig() !== null : getBkashConfig() !== null;
+      return json({ configured: available, environment: PAYMENT_ENV });
+    }
+
+
     if (!orderId || !/^[0-9a-f-]{36}$/i.test(orderId)) {
       return json({ error: "A valid order_id is required" }, 400);
     }

@@ -27,6 +27,12 @@ interface CreateOrderRequest {
   payment_method: 'cod' | 'bkash' | 'nagad';
   transaction_id?: string;
   session_id?: string;
+  /**
+   * 'gateway' means the customer will pay through the automated bKash/Nagad
+   * checkout right after the order is created, so no transaction ID is typed in.
+   * 'manual' means they sent money themselves and pasted a transaction ID.
+   */
+  payment_flow?: 'gateway' | 'manual';
 }
 
 serve(async (req) => {
@@ -44,6 +50,7 @@ serve(async (req) => {
     
     const body: CreateOrderRequest = await req.json();
     const { items, customer_details, payment_method, transaction_id, session_id } = body;
+    const paymentFlow: 'gateway' | 'manual' = body.payment_flow === 'gateway' ? 'gateway' : 'manual';
 
     console.log('Received order request:', { 
       itemCount: items?.length, 
@@ -106,8 +113,13 @@ serve(async (req) => {
       );
     }
 
-    // Require transaction ID for mobile payments
-    if ((payment_method === 'bkash' || payment_method === 'nagad') && (!transaction_id || transaction_id.trim().length === 0)) {
+    // Require transaction ID for manually-sent mobile payments only.
+    // Gateway payments get their transaction ID from the provider after checkout.
+    if (
+      paymentFlow === 'manual' &&
+      (payment_method === 'bkash' || payment_method === 'nagad') &&
+      (!transaction_id || transaction_id.trim().length === 0)
+    ) {
       return new Response(
         JSON.stringify({ error: 'Transaction ID is required for mobile payments' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -203,7 +215,11 @@ serve(async (req) => {
         total_amount: totalAmount, // Server-calculated total
         status: 'pending',
         payment_method: payment_method,
-        transaction_id: payment_method !== 'cod' ? transaction_id?.trim() : null,
+        transaction_id: payment_method !== 'cod' && paymentFlow === 'manual' ? transaction_id?.trim() : null,
+        payment_status: payment_method === 'cod'
+          ? 'unpaid'
+          : paymentFlow === 'manual' ? 'pending_verification' : 'unpaid',
+        payment_gateway: payment_method !== 'cod' && paymentFlow === 'gateway' ? payment_method : null,
       }])
       .select()
       .single();
