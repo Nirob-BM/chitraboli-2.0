@@ -610,52 +610,98 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
                       {paymentMethod === "bkash" ? "bKash" : "Nagad"} Payment
                     </span>
                   </div>
-                  
-                  <ol className="text-sm text-muted-foreground space-y-1.5 list-decimal list-inside mb-4">
-                    <li>Open your {paymentMethod === "bkash" ? "bKash" : "Nagad"} app</li>
-                    <li>Select <strong>"Send Money"</strong></li>
-                    <li>Send <strong className={paymentMethod === "bkash" ? "text-[#E2136E]" : "text-[#F6921E]"}>৳{totalPrice.toLocaleString()}</strong> to:</li>
-                  </ol>
 
-                  <div className={`flex items-center gap-2 p-3 rounded-lg border ${
-                    paymentMethod === "bkash" 
-                      ? "bg-[#E2136E]/10 border-[#E2136E]/30" 
-                      : "bg-[#F6921E]/10 border-[#F6921E]/30"
-                  }`}>
-                    <span className={`font-mono font-bold text-lg flex-1 ${
-                      paymentMethod === "bkash" ? "text-[#E2136E]" : "text-[#F6921E]"
-                    }`}>
-                      {PAYMENT_NUMBER}
-                    </span>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => copyToClipboard(PAYMENT_NUMBER)}
-                      className="h-8 px-3 hover:bg-background/50"
-                    >
-                      <Copy className="w-4 h-4 mr-1" />
-                      Copy
-                    </Button>
-                  </div>
+                  {checkingGateway && (
+                    <p className="text-sm text-muted-foreground flex items-center gap-2 mb-3">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Checking payment options...
+                    </p>
+                  )}
 
-                  <div className="mt-4 space-y-1.5">
-                    <label className="text-sm font-medium text-foreground">Transaction ID *</label>
-                    <Input
-                      value={transactionId}
-                      onChange={(e) => {
-                        setTransactionId(e.target.value);
-                        if (fieldErrors.transactionId) setFieldErrors({});
-                      }}
-                      className={`bg-background ${
+                  {gatewayAvailable && (
+                    <div className="flex flex-col sm:flex-row gap-2 mb-4">
+                      <Button
+                        type="button"
+                        variant={paymentFlow === "gateway" ? "default" : "outline"}
+                        size="sm"
+                        className="flex-1"
+                        onClick={() => {
+                          setPaymentFlow("gateway");
+                          setFieldErrors({});
+                        }}
+                      >
+                        Pay now in app
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={paymentFlow === "manual" ? "default" : "outline"}
+                        size="sm"
+                        className="flex-1"
+                        onClick={() => setPaymentFlow("manual")}
+                      >
+                        I'll send money myself
+                      </Button>
+                    </div>
+                  )}
+
+                  {paymentFlow === "gateway" ? (
+                    <p className="text-sm text-muted-foreground">
+                      After you confirm the order, you'll be taken to the secure{" "}
+                      {paymentMethod === "bkash" ? "bKash" : "Nagad"} page to pay{" "}
+                      <strong className={paymentMethod === "bkash" ? "text-[#E2136E]" : "text-[#F6921E]"}>
+                        ৳{totalPrice.toLocaleString()}
+                      </strong>
+                      . Your payment is confirmed automatically — no transaction ID needed.
+                    </p>
+                  ) : (
+                    <>
+                      <ol className="text-sm text-muted-foreground space-y-1.5 list-decimal list-inside mb-4">
+                        <li>Open your {paymentMethod === "bkash" ? "bKash" : "Nagad"} app</li>
+                        <li>Select <strong>"Send Money"</strong></li>
+                        <li>Send <strong className={paymentMethod === "bkash" ? "text-[#E2136E]" : "text-[#F6921E]"}>৳{totalPrice.toLocaleString()}</strong> to:</li>
+                      </ol>
+
+                      <div className={`flex items-center gap-2 p-3 rounded-lg border ${
                         paymentMethod === "bkash" 
-                          ? "border-[#E2136E]/30 focus:border-[#E2136E]" 
-                          : "border-[#F6921E]/30 focus:border-[#F6921E]"
-                      } ${fieldErrors.transactionId ? "border-destructive" : ""}`}
-                      placeholder="e.g., TXN123456789"
-                    />
-                    {fieldErrors.transactionId && <p className="text-xs text-destructive">{fieldErrors.transactionId}</p>}
-                  </div>
+                          ? "bg-[#E2136E]/10 border-[#E2136E]/30" 
+                          : "bg-[#F6921E]/10 border-[#F6921E]/30"
+                      }`}>
+                        <span className={`font-mono font-bold text-lg flex-1 ${
+                          paymentMethod === "bkash" ? "text-[#E2136E]" : "text-[#F6921E]"
+                        }`}>
+                          {PAYMENT_NUMBER}
+                        </span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => copyToClipboard(PAYMENT_NUMBER)}
+                          className="h-8 px-3 hover:bg-background/50"
+                        >
+                          <Copy className="w-4 h-4 mr-1" />
+                          Copy
+                        </Button>
+                      </div>
+
+                      <div className="mt-4 space-y-1.5">
+                        <label className="text-sm font-medium text-foreground">Transaction ID *</label>
+                        <Input
+                          value={transactionId}
+                          onChange={(e) => {
+                            setTransactionId(e.target.value);
+                            if (fieldErrors.transactionId) setFieldErrors({});
+                          }}
+                          className={`bg-background ${
+                            paymentMethod === "bkash" 
+                              ? "border-[#E2136E]/30 focus:border-[#E2136E]" 
+                              : "border-[#F6921E]/30 focus:border-[#F6921E]"
+                          } ${fieldErrors.transactionId ? "border-destructive" : ""}`}
+                          placeholder="e.g., TXN123456789"
+                        />
+                        {fieldErrors.transactionId && <p className="text-xs text-destructive">{fieldErrors.transactionId}</p>}
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
             </div>
