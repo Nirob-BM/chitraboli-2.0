@@ -29,6 +29,8 @@ const CustomerDetailsSchema = z.object({
   address: z.string().min(10, "Please enter a complete address").max(500, "Address is too long"),
 });
 
+type PaymentFlow = "gateway" | "manual";
+
 interface CheckoutProgress {
   formData: { name: string; email: string; phone: string; address: string };
   paymentMethod: "cod" | "bkash" | "nagad";
