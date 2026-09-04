@@ -181,7 +181,7 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
       return true;
     }
     if (step === 1) {
-      if ((paymentMethod === "bkash" || paymentMethod === "nagad") && !transactionId.trim()) {
+      if (isMobileBanking && paymentFlow === "manual" && !transactionId.trim()) {
         setFieldErrors({ transactionId: "Transaction ID is required for mobile banking" });
         return false;
       }
