@@ -54,6 +54,7 @@ const Admin = lazy(() => import("./pages/Admin"));
 const Auth = lazy(() => import("./pages/Auth"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const TrackOrder = lazy(() => import("./pages/TrackOrder"));
+const PaymentReturn = lazy(() => import("./pages/PaymentReturn"));
 const ProductDetail = lazy(() => import("./pages/ProductDetail"));
 const Profile = lazy(() => import("./pages/Profile"));
 const NotFound = lazy(() => import("./pages/NotFound"));
