@@ -227,7 +227,9 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
             address: formData.address,
           },
           payment_method: paymentMethod,
-          transaction_id: paymentMethod !== "cod" ? transactionId.trim() : undefined,
+          transaction_id:
+            paymentMethod !== "cod" && paymentFlow === "manual" ? transactionId.trim() : undefined,
+          payment_flow: isMobileBanking ? paymentFlow : "manual",
           session_id: sessionId,
         },
       });
@@ -244,6 +246,41 @@ export const CheckoutModal = ({ open, onOpenChange }: CheckoutModalProps) => {
       }
 
       const orderData = response.order;
+
+      // Automatic wallet payment: hand the customer over to the bKash/Nagad
+      // checkout. The gateway redirects back to /payment/return once done.
+      if (isMobileBanking && paymentFlow === "gateway") {
+        const { data: payment, error: paymentError } = await supabase.functions.invoke(
+          "payment-initiate",
+          {
+            body: {
+              order_id: orderData.id,
+              provider: paymentMethod,
+              return_origin: window.location.origin,
+            },
+          }
+        );
+
+        if (paymentError || !payment?.redirect_url) {
+          if (payment?.configured === false) {
+            setGatewayAvailable(false);
+            setPaymentFlow("manual");
+            setCurrentStep(1);
+            toast({
+              title: "Automatic payment unavailable",
+              description:
+                "Please send the money from your app and enter the transaction ID instead.",
+              variant: "destructive",
+            });
+            return;
+          }
+          throw new Error(payment?.error || "Could not open the payment page. Please try again.");
+        }
+
+        clearProgress();
+        window.location.href = payment.redirect_url as string;
+        return;
+      }
 
       // Use server-validated total amount for WhatsApp message
       const serverTotalAmount = orderData.total_amount;
