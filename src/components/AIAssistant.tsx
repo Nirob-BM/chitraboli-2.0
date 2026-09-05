@@ -25,7 +25,7 @@ export const AIAssistant = () => {
       <button
         onClick={toggle}
         className={cn(
-          "flex items-center justify-center gap-2 rounded-full",
+          "relative flex items-center justify-center gap-2 rounded-full",
           "h-11 w-11 sm:h-auto sm:w-auto sm:px-4 sm:py-2",
           "bg-gradient-to-br from-purple-accent to-purple-accent/80",
           "shadow-[0_0_20px_rgba(139,92,246,0.4)]",
