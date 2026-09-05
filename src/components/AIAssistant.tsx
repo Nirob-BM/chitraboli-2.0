@@ -25,19 +25,23 @@ export const AIAssistant = () => {
       <button
         onClick={toggle}
         className={cn(
-          "flex items-center gap-2 px-4 py-2 rounded-full",
+          "flex items-center justify-center gap-2 rounded-full",
+          "h-11 w-11 sm:h-auto sm:w-auto sm:px-4 sm:py-2",
           "bg-gradient-to-br from-purple-accent to-purple-accent/80",
           "shadow-[0_0_20px_rgba(139,92,246,0.4)]",
-          "transition-all duration-300 hover:scale-105",
+          "transition-all duration-300 hover:scale-105 active:scale-95",
           "text-white text-sm font-medium"
         )}
         aria-label="Toggle AI Assistant"
         aria-expanded={isOpen}
       >
-        <Sparkles className="w-5 h-5" />
+        <Sparkles className="w-5 h-5 shrink-0" />
         <span className="hidden sm:inline">AI Assistant</span>
-        {!isOpen && <span className="w-2 h-2 bg-gold rounded-full animate-pulse" />}
+        {!isOpen && (
+          <span className="absolute top-0 right-0 sm:static w-2 h-2 bg-gold rounded-full animate-pulse" />
+        )}
       </button>
+
 
       {hasLoaded && (
         <Suspense fallback={null}>
